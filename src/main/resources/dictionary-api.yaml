@@ -7,23 +7,13 @@ info:
 servers:
   - url: http://localhost:8081/
 paths:
-  /api/v1/demo:
+  /api/v1/phrase:
     get:
-      summary: get demo
-      operationId: get demo
+      summary: get phrases by filter
+      operationId: getPhrases
       tags:
-        - demo
+        - phrase
       parameters:
-        - name: name
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: type
-          in: query
-          required: false
-          schema:
-            $ref: "#/components/schemas/DemoTypeDto"
         - name: page
           in: query
           required: false
@@ -43,60 +33,60 @@ paths:
             type: string
       responses:
         '200':
-          description: demo page
+          description: page of phrases
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageOfDemoDto"
+                $ref: "#/components/schemas/PageOfPhraseDto"
     post:
-      summary: post demo
-      operationId: post demo
+      summary: create phrase
+      operationId: createPhrase
       tags:
-        - demo
+        - phrase
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateDemoDto"
+              $ref: "#/components/schemas/CreatePhraseRequest"
       responses:
         '201':
-          description: demo created
+          description: phrase created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DemoDto"
-  /api/v1/demo/{demoId}:
+                $ref: "#/components/schemas/PhraseDto"
+  /api/v1/phrase/{phraseId}:
     get:
-      summary: get demo by id
-      operationId: get demo by id
+      summary: get phrase by id
+      operationId: getPhraseById
       tags:
-        - demo
+        - phrase
       parameters:
-        - name: demoId
+        - name: phraseId
           in: path
           required: true
-          description: id of demo
+          description: id of the phrase
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: get demo by id
+          description: get phrase by id
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DemoDto"
+                $ref: "#/components/schemas/PhraseDto"
     put:
-      summary: put demo
-      operationId: put demo
+      summary: update phrase
+      operationId: updatePhrase
       tags:
-        - demo
+        - phrase
       parameters:
-        - name: demoId
+        - name: phraseId
           in: path
           required: true
-          description: The id of the base product to update
+          description: The id of the phrase to update
           schema:
             type: integer
             format: int64
@@ -105,31 +95,148 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateDemoDto"
+              $ref: "#/components/schemas/UpdatePhraseRequest"
       responses:
         '200':
-          description: updated base product
+          description: updated phrase
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DemoDto"
+                $ref: "#/components/schemas/PhraseDto"
     delete:
-      summary: delete demo
-      operationId: delete demo
+      summary: delete phrase
+      operationId: deletePhraseById
       tags:
-        - demo
+        - phrase
       parameters:
-        - name: demoId
+        - name: phraseId
           in: path
           required: true
-          description: The id of the base product to delete
+          description: The id of the phrase to delete
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: demo deleted
-
+          description: phrase deleted
+  /api/v1/tag:
+    get:
+      summary: get tags by filter
+      operationId: getTags
+      tags:
+        - tag
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: page of tags
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageOfTagDto"
+    post:
+      summary: create tag
+      operationId: createTag
+      tags:
+        - tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagRequest"
+      responses:
+        '201':
+          description: tag created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagDto"
+  /api/v1/tag/{tagKey}:
+    get:
+      summary: get tag by key
+      operationId: getTagByKey
+      tags:
+        - tag
+      parameters:
+        - name: tagKey
+          in: path
+          required: true
+          description: the key of the tag
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+            pattern: '^[0-9a-zA-Z-_]+$'
+      responses:
+        '200':
+          description: get tag by key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagDto"
+    put:
+      summary: update tag by key
+      operationId: updateTagByKey
+      tags:
+        - tag
+      parameters:
+        - name: tagKey
+          in: path
+          required: true
+          description: the key of the tag
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+            pattern: '^[0-9a-zA-Z-_]+$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagRequest"
+      responses:
+        '200':
+          description: get tag by id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagDto"
+    delete:
+      summary: delete tag by key
+      operationId: deleteTagByKey
+      tags:
+        - tag
+      parameters:
+        - name: tagKey
+          in: path
+          required: true
+          description: The key of the tag to delete
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+            pattern: '^[0-9a-zA-Z-_]+$'
+      responses:
+        '200':
+          description: tag deleted
 components:
   schemas:
     DemoTypeDto:
@@ -183,3 +290,157 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DemoDto"
+    LangDto:
+      type: string
+      enum:
+        - UNKNOWN
+        - RU
+        - FR
+        - EN
+    PhraseDto:
+      type: object
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - source
+        - sourceLang
+        - transcription
+        - target
+        - targetLang
+      properties:
+        id:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        source:
+          type: string
+        sourceLang:
+          $ref: "#/components/schemas/LangDto"
+        transcription:
+          type: string
+        target:
+          type: string
+        targetLang:
+          $ref: "#/components/schemas/LangDto"
+    PageOfPhraseDto:
+      type: object
+      required:
+        - content
+      properties:
+        size:
+          type: integer
+        number:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/PhraseDto"
+    CreatePhraseRequest:
+      type: object
+      required:
+        - source
+        - sourceLang
+        - transcription
+        - target
+        - targetLang
+      properties:
+        source:
+          type: string
+        sourceLang:
+          $ref: "#/components/schemas/LangDto"
+        transcription:
+          type: string
+        target:
+          type: string
+        targetLang:
+          $ref: "#/components/schemas/LangDto"
+    UpdatePhraseRequest:
+      type: object
+      required:
+        - id
+        - source
+        - sourceLang
+        - transcription
+        - target
+        - targetLang
+      properties:
+        id:
+          type: integer
+          format: int64
+        source:
+          type: string
+        sourceLang:
+          $ref: "#/components/schemas/LangDto"
+        transcription:
+          type: string
+        target:
+          type: string
+        targetLang:
+          $ref: "#/components/schemas/LangDto"
+    TagDto:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: '^[0-9a-zA-Z-_]+$'
+    PageOfTagDto:
+      type: object
+      required:
+        - size
+        - numeber
+        - totalElements
+        - totalPages
+        - content
+      properties:
+        size:
+          type: integer
+        number:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/TagDto"
+    CreateTagRequest:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: '^[0-9a-zA-Z-_]+$'
+        lesson_id:
+          type: integer
+          format: int64
+    UpdateTagRequest:
+      type: object
+      required:
+        - newKey
+      properties:
+        newKey:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: '^[0-9a-zA-Z-_]+$'
+

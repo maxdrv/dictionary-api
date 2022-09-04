@@ -1,61 +1,97 @@
 package com.home.dictionary.api;
 
-import com.home.dictionary.mapper.DemoMapper;
-import com.home.dictionary.model.demo.DemoFilter;
+import com.home.dictionary.mapper.PhraseMapper;
+import com.home.dictionary.mapper.TagMapper;
 import com.home.dictionary.openapi.api.ApiApiDelegate;
 import com.home.dictionary.openapi.model.*;
-import com.home.dictionary.service.DemoService;
+import com.home.dictionary.service.PhraseService;
+import com.home.dictionary.service.TagService;
 import com.home.dictionary.util.PageableBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class ApiDelegateImpl implements ApiApiDelegate {
 
-    private final DemoService demoService;
-    private final DemoMapper demoMapper;
+    private final TagService tagService;
+    private final TagMapper tagMapper;
+    private final PhraseService phraseService;
+    private final PhraseMapper phraseMapper;
 
     @Override
-    public ResponseEntity<PageOfDemoDto> getDemo(@Nullable String name, @Nullable DemoTypeDto type, Integer page, Integer size, String sort) {
+    public ResponseEntity<PageOfPhraseDto> getPhrases(Integer page, Integer size, String sort) {
         var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
-        return ResponseEntity.ok(
-                demoService.page(
-                        new DemoFilter(
-                                name,
-                                Optional.ofNullable(type)
-                                        .map(demoMapper::fromDto)
-                                        .orElse(null)
-                        ),
-                        pageable
-                )
-        );
+        var result = phraseService.getPage(pageable);
+        var pageOfPhrases = new PageOfPhraseDto()
+                .size(result.getSize())
+                .number(result.getNumber())
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .content(result.getContent().stream().map(phraseMapper::map).toList());
+        return ResponseEntity.ok(pageOfPhrases);
     }
 
     @Override
-    public ResponseEntity<DemoDto> getDemoById(Long demoId) {
-        return ResponseEntity.ok(demoService.findById(demoId));
+    public ResponseEntity<PhraseDto> getPhraseById(Long phraseId) {
+        var entity = phraseService.getPhraseByIdOrThrow(phraseId);
+        return ResponseEntity.ok(phraseMapper.map(entity));
     }
 
     @Override
-    public ResponseEntity<DemoDto> postDemo(CreateDemoDto createDemoDto) {
-        return new ResponseEntity<>(demoService.create(createDemoDto), HttpStatus.CREATED);
+    public ResponseEntity<PhraseDto> createPhrase(CreatePhraseRequest createPhraseRequest) {
+        var entity = phraseService.create(createPhraseRequest);
+        return new ResponseEntity<>(phraseMapper.map(entity), HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<DemoDto> putDemo(Long demoId, UpdateDemoDto updateDemoDto) {
-        return ResponseEntity.ok(demoService.update(demoId, updateDemoDto));
+    public ResponseEntity<PhraseDto> updatePhrase(Long phraseId, UpdatePhraseRequest updatePhraseRequest) {
+        var entity = phraseService.update(phraseId, updatePhraseRequest);
+        return ResponseEntity.ok(phraseMapper.map(entity));
     }
 
     @Override
-    public ResponseEntity<Void> deleteDemo(Long demoId) {
-        demoService.delete(demoId);
+    public ResponseEntity<Void> deletePhraseById(Long phraseId) {
+        phraseService.deleteById(phraseId);
         return ResponseEntity.ok().build();
     }
 
+    @Override
+    public ResponseEntity<PageOfTagDto> getTags(Integer page, Integer size, String sort) {
+        var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
+        var result = tagService.getPage(pageable);
+        var pageOfTags = new PageOfTagDto()
+                .size(result.getSize())
+                .number(result.getNumber())
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .content(result.getContent().stream().map(tagMapper::map).toList());
+        return ResponseEntity.ok(pageOfTags);
+    }
+
+    @Override
+    public ResponseEntity<TagDto> getTagByKey(String tagKey) {
+        var entity = tagService.getTagByKeyOrThrow(tagKey);
+        return ResponseEntity.ok(tagMapper.map(entity));
+    }
+
+    @Override
+    public ResponseEntity<TagDto> createTag(CreateTagRequest createTagRequest) {
+        var entity = tagService.createTag(createTagRequest);
+        return new ResponseEntity<>(tagMapper.map(entity), HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<TagDto> updateTagByKey(String tagKey, UpdateTagRequest updateTagRequest) {
+        var entity = tagService.updateTag(tagKey, updateTagRequest);
+        return ResponseEntity.ok(tagMapper.map(entity));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteTagByKey(String tagKey) {
+        tagService.deleteByKey(tagKey);
+        return ResponseEntity.ok().build();
+    }
 }

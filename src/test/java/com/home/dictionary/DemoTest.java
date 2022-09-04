@@ -7,11 +7,13 @@ import com.home.dictionary.openapi.model.DemoDto;
 import com.home.dictionary.openapi.model.DemoTypeDto;
 import com.home.dictionary.openapi.model.UpdateDemoDto;
 import com.home.dictionary.util.WithDataBase;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Disabled
 public class DemoTest extends WithDataBase {
 
     @ExpectedDatabase(
