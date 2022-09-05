@@ -64,8 +64,4 @@ public class PhraseService {
         phraseRepository.deleteById(phraseId);
     }
 
-    public void deleteByLessonIdAndPhraseId(Long lessonId, Long phraseId) {
-        phraseRepository.deleteByIdAndLessonId(phraseId, lessonId);
-    }
-
 }

@@ -1,10 +1,9 @@
 package com.home.dictionary.model.lesson;
 
-import com.home.dictionary.model.tag.Tag;
 import com.home.dictionary.model.phrase.Phrase;
+import com.home.dictionary.model.tag.Tag;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.time.Instant;

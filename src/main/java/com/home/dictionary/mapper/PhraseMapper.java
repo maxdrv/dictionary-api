@@ -3,6 +3,7 @@ package com.home.dictionary.mapper;
 import com.home.dictionary.model.phrase.Phrase;
 import com.home.dictionary.openapi.model.PhraseDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
@@ -12,6 +13,7 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface PhraseMapper {
 
+    @Mapping(target = "lessonId", source = "entity.lesson.id")
     PhraseDto map(Phrase entity);
 
 }

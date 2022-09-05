@@ -1,10 +1,11 @@
 package com.home.dictionary.model.phrase;
 
 import com.home.dictionary.model.lesson.Lesson;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -32,7 +33,6 @@ public class Phrase {
     private Instant updatedAt;
 
     @ManyToOne
-    @Fetch(FetchMode.JOIN)
     @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 

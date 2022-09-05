@@ -4,10 +4,7 @@ package com.home.dictionary.service;
 import com.home.dictionary.exception.ApiEntityNotFoundException;
 import com.home.dictionary.model.lesson.Lesson;
 import com.home.dictionary.model.tag.Tag;
-import com.home.dictionary.openapi.model.CreateLessonRequest;
-import com.home.dictionary.openapi.model.CreatePhraseRequest;
-import com.home.dictionary.openapi.model.CreateTagRequest;
-import com.home.dictionary.openapi.model.UpdateLessonRequest;
+import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.repository.LessonRepository;
 import lombok.RequiredArgsConstructor;
 import one.util.streamex.StreamEx;
@@ -18,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -86,16 +84,41 @@ public class LessonService {
     }
 
     public Lesson addPhraseToLesson(Long lessonId, CreatePhraseRequest createPhraseRequest) {
+        var lesson = getLessonByIdOrThrow(lessonId);
+
         var newPhrase = phraseService.create(createPhraseRequest);
+        newPhrase.setLesson(lesson);
 
-        var toUpdated = getLessonByIdOrThrow(lessonId);
-        toUpdated.getPhrases().add(newPhrase);
-
-        return lessonRepository.save(toUpdated);
+        return lessonRepository.save(lesson);
     }
 
-    public void removePhraseFromLesson(Long lessonId, Long phraseId) {
-        phraseService.deleteByLessonIdAndPhraseId(lessonId, phraseId);
+    public Lesson updatePhraseInLesson(Long lessonId, Long phraseId, UpdatePhraseRequest updatePhraseRequest) {
+        var lesson = getLessonByIdOrThrow(lessonId);
+
+        var maybePhrase = StreamEx.of(lesson.getPhrases())
+                .findFirst(phrase -> Objects.equals(phrase.getId(), phraseId));
+
+        if (maybePhrase.isPresent()) {
+            var phraseToUpdate = maybePhrase.get();
+            phraseService.update(phraseToUpdate.getId(), updatePhraseRequest);
+        }
+
+        return getLessonByIdOrThrow(lesson.getId());
+    }
+
+    public Lesson removePhraseFromLesson(Long lessonId, Long phraseId) {
+        var lesson = getLessonByIdOrThrow(lessonId);
+
+        var maybePhrase = StreamEx.of(lesson.getPhrases())
+                .findFirst(phrase -> Objects.equals(phrase.getId(), phraseId));
+
+        if (maybePhrase.isPresent()) {
+            var phraseToDelete = maybePhrase.get();
+            phraseToDelete.setLesson(null);
+            phraseService.deleteById(phraseToDelete.getId());
+        }
+
+        return getLessonByIdOrThrow(lesson.getId());
     }
 
 }

@@ -171,9 +171,15 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     }
 
     @Override
-    public ResponseEntity<Void> removePhraseFromLesson(Long lessonId, Long phraseId) {
-        lessonService.removePhraseFromLesson(lessonId, phraseId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<LessonDetailedDto> updatePhraseInLesson(Long lessonId, Long phraseId, UpdatePhraseRequest updatePhraseRequest) {
+        var entity = lessonService.updatePhraseInLesson(lessonId, phraseId, updatePhraseRequest);
+        return ResponseEntity.ok(lessonMapper.toDetailedDto(entity));
+    }
+
+    @Override
+    public ResponseEntity<LessonDetailedDto> removePhraseFromLesson(Long lessonId, Long phraseId) {
+        var entity = lessonService.removePhraseFromLesson(lessonId, phraseId);
+        return ResponseEntity.ok(lessonMapper.toDetailedDto(entity));
     }
 
 }

@@ -11,7 +11,8 @@ create table if not exists phrase
     source_lang   text        not null,
     transcription text        not null,
     target        text        not null,
-    target_lang   text        not null
+    target_lang   text        not null,
+    constraint phrase_fk_lesson foreign key (lesson_id) REFERENCES lesson (id)
 );
 
 create sequence if not exists phrase_seq start 10000 increment 10;
