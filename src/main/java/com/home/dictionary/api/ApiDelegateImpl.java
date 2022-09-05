@@ -1,9 +1,11 @@
 package com.home.dictionary.api;
 
+import com.home.dictionary.mapper.LessonMapper;
 import com.home.dictionary.mapper.PhraseMapper;
 import com.home.dictionary.mapper.TagMapper;
 import com.home.dictionary.openapi.api.ApiApiDelegate;
 import com.home.dictionary.openapi.model.*;
+import com.home.dictionary.service.LessonService;
 import com.home.dictionary.service.PhraseService;
 import com.home.dictionary.service.TagService;
 import com.home.dictionary.util.PageableBuilder;
@@ -12,10 +14,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class ApiDelegateImpl implements ApiApiDelegate {
 
+    private final LessonService lessonService;
+    private final LessonMapper lessonMapper;
     private final TagService tagService;
     private final TagMapper tagMapper;
     private final PhraseService phraseService;
@@ -94,4 +100,80 @@ public class ApiDelegateImpl implements ApiApiDelegate {
         tagService.deleteByKey(tagKey);
         return ResponseEntity.ok().build();
     }
+
+    @Override
+    public ResponseEntity<PageOfLessonGridDto> getLessons(
+            String description,
+            List<String> tags,
+            Integer page,
+            Integer size,
+            String sort
+    ) {
+        var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
+        var result = lessonService.getPage(pageable);
+        var pageOfLessonGridDto = new PageOfLessonGridDto()
+                .size(result.getSize())
+                .number(result.getNumber())
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .content(result.getContent().stream().map(lessonMapper::toGridDto).toList());
+        return ResponseEntity.ok(pageOfLessonGridDto);
+    }
+
+    @Override
+    public ResponseEntity<LessonDetailedDto> getLessonById(Long lessonId) {
+        var entity = lessonService.getLessonByIdOrThrow(lessonId);
+        return ResponseEntity.ok(lessonMapper.toDetailedDto(entity));
+    }
+
+    @Override
+    public ResponseEntity<LessonDetailedDto> createLesson(CreateLessonRequest createLessonRequest) {
+        var entity = lessonService.createLesson(createLessonRequest);
+        return new ResponseEntity<>(lessonMapper.toDetailedDto(entity), HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<LessonDetailedDto> updateLessonById(Long lessonId, UpdateLessonRequest updateLessonRequest) {
+        var entity = lessonService.updateLesson(lessonId, updateLessonRequest);
+        return ResponseEntity.ok(lessonMapper.toDetailedDto(entity));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteLessonById(Long lessonId) {
+        lessonService.deleteById(lessonId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<ListOfTagDto> getTagsByLessonId(Long lessonId) {
+        var listOfTags = tagService.getTagsByLessonId(lessonId);
+        var listOfTagDto = new ListOfTagDto();
+        listOfTagDto.content(listOfTags.stream().map(tagMapper::map).toList());
+        return ResponseEntity.ok(listOfTagDto);
+    }
+
+    @Override
+    public ResponseEntity<ListOfTagDto> addTagToLesson(Long lessonId, CreateTagRequest createTagRequest) {
+        lessonService.addTagToLesson(lessonId, createTagRequest);
+        return getTagsByLessonId(lessonId);
+    }
+
+    @Override
+    public ResponseEntity<ListOfTagDto> removeTagFromLesson(Long lessonId, String tagKey) {
+        lessonService.removeTagFromLesson(lessonId, tagKey);
+        return getTagsByLessonId(lessonId);
+    }
+
+    @Override
+    public ResponseEntity<LessonDetailedDto> addPhraseToLesson(Long lessonId, CreatePhraseRequest createPhraseRequest) {
+        var entity = lessonService.addPhraseToLesson(lessonId, createPhraseRequest);
+        return ResponseEntity.ok(lessonMapper.toDetailedDto(entity));
+    }
+
+    @Override
+    public ResponseEntity<Void> removePhraseFromLesson(Long lessonId, Long phraseId) {
+        lessonService.removePhraseFromLesson(lessonId, phraseId);
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -6,4 +6,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface PhraseRepository extends PagingAndSortingRepository<Phrase, Long>, JpaSpecificationExecutor<Phrase> {
 
+    void deleteByIdAndLessonId(Long id, Long lessonId);
+
 }

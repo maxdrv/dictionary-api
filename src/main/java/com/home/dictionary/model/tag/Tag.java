@@ -1,5 +1,6 @@
 package com.home.dictionary.model.tag;
 
+import com.home.dictionary.model.lesson.Lesson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -32,5 +34,8 @@ public class Tag {
     private Instant updatedAt;
 
     private String key;
+
+    @ManyToMany(mappedBy = "tags")
+    private Set<Lesson> lessons;
 
 }

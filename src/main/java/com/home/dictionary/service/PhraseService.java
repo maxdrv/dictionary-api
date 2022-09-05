@@ -29,12 +29,12 @@ public class PhraseService {
         return phraseRepository.findAll(pageable);
     }
 
-    public Optional<Phrase> getPageById(Long phraseId) {
+    public Optional<Phrase> getPhraseById(Long phraseId) {
         return phraseRepository.findById(phraseId);
     }
 
     public Phrase getPhraseByIdOrThrow(Long phraseId) {
-        return getPageById(phraseId)
+        return getPhraseById(phraseId)
                 .orElseThrow(() -> new ApiEntityNotFoundException("Phrase with id " + phraseId + " not found"));
     }
 
@@ -62,6 +62,10 @@ public class PhraseService {
 
     public void deleteById(Long phraseId) {
         phraseRepository.deleteById(phraseId);
+    }
+
+    public void deleteByLessonIdAndPhraseId(Long lessonId, Long phraseId) {
+        phraseRepository.deleteByIdAndLessonId(phraseId, lessonId);
     }
 
 }

@@ -40,9 +40,6 @@ public class Lesson {
 
     private String description;
 
-    @Nullable
-    private Instant startAt;
-
     @ManyToMany
     @JoinTable(
             name = "lesson_tag_mapping",

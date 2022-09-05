@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -27,6 +28,10 @@ public class TagService {
         return tagRepository.findAll(pageable);
     }
 
+    public List<Tag> getTagsByLessonId(Long lessonId) {
+        return tagRepository.findAllByLessonsId(lessonId);
+    }
+
     public Optional<Tag> getTagByKey(String key) {
         return tagRepository.findByKey(key);
     }
@@ -40,6 +45,12 @@ public class TagService {
         var toSave = new Tag();
         toSave.setKey(request.getKey());
         return tagRepository.save(toSave);
+    }
+
+    public List<Tag> createTags(List<CreateTagRequest> requests) {
+        return requests.stream()
+                .map(this::createTag)
+                .toList();
     }
 
     public Tag updateTag(String tagKey, UpdateTagRequest request) {
