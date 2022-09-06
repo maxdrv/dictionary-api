@@ -13,7 +13,7 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface PhraseMapper {
 
-    @Mapping(target = "lessonId", source = "entity.lesson.id")
+    @Mapping(target = "planId", source = "entity.plan.id")
     PhraseDto map(Phrase entity);
 
 }

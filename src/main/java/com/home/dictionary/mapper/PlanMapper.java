@@ -1,8 +1,8 @@
 package com.home.dictionary.mapper;
 
-import com.home.dictionary.model.lesson.Lesson;
-import com.home.dictionary.openapi.model.LessonDetailedDto;
-import com.home.dictionary.openapi.model.LessonGridDto;
+import com.home.dictionary.model.plan.Plan;
+import com.home.dictionary.openapi.model.PlanDetailedDto;
+import com.home.dictionary.openapi.model.PlanGridDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.ReportingPolicy;
@@ -16,10 +16,10 @@ import org.mapstruct.ReportingPolicy;
                 PhraseMapper.class
         }
 )
-public interface LessonMapper {
+public interface PlanMapper {
 
-    LessonDetailedDto toDetailedDto(Lesson entity);
+    PlanDetailedDto toDetailedDto(Plan entity);
 
-    LessonGridDto toGridDto(Lesson entity);
+    PlanGridDto toGridDto(Plan entity);
 
 }

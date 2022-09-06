@@ -13,6 +13,6 @@ public interface TagRepository extends PagingAndSortingRepository<Tag, String>, 
 
     void deleteByKey(String key);
 
-    List<Tag> findAllByLessonsId(Long lessonId);
+    List<Tag> findAllByPlansId(Long planId);
 
 }

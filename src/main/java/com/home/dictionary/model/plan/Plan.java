@@ -1,4 +1,4 @@
-package com.home.dictionary.model.lesson;
+package com.home.dictionary.model.plan;
 
 import com.home.dictionary.model.phrase.Phrase;
 import com.home.dictionary.model.tag.Tag;
@@ -16,12 +16,12 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 
 @Entity
-@Table(name = "lesson")
-public class Lesson {
+@Table(name = "plan")
+public class Plan {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lesson_seq")
-    @SequenceGenerator(name = "lesson_seq", sequenceName = "lesson_seq", allocationSize = 10)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "plan_seq")
+    @SequenceGenerator(name = "plan_seq", sequenceName = "plan_seq", allocationSize = 10)
     @EqualsAndHashCode.Include
     private Long id;
 
@@ -33,7 +33,7 @@ public class Lesson {
     private Instant updatedAt;
 
     @Setter(AccessLevel.NONE)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "lesson")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "plan")
     @OrderBy("id")
     private List<Phrase> phrases;
 
@@ -41,8 +41,8 @@ public class Lesson {
 
     @ManyToMany
     @JoinTable(
-            name = "lesson_tag_mapping",
-            joinColumns = { @JoinColumn(name = "lesson_id") },
+            name = "plan_tag_mapping",
+            joinColumns = { @JoinColumn(name = "plan_id") },
             inverseJoinColumns = { @JoinColumn(name = "tag_id") }
     )
     private Set<Tag> tags;

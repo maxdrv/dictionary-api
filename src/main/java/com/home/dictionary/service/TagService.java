@@ -28,8 +28,8 @@ public class TagService {
         return tagRepository.findAll(pageable);
     }
 
-    public List<Tag> getTagsByLessonId(Long lessonId) {
-        return tagRepository.findAllByLessonsId(lessonId);
+    public List<Tag> getTagsByPlanId(Long planId) {
+        return tagRepository.findAllByPlansId(planId);
     }
 
     public Optional<Tag> getTagByKey(String key) {

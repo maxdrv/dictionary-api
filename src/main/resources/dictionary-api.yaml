@@ -237,12 +237,12 @@ paths:
       responses:
         '200':
           description: tag deleted
-  /api/v1/lesson:
+  /api/v1/plan:
     get:
-      summary: get lesson by filter
-      operationId: getLessons
+      summary: get plan by filter
+      operationId: getPlans
       tags:
-        - lesson
+        - plan
       parameters:
         - name: description
           in: query
@@ -278,60 +278,60 @@ paths:
             type: string
       responses:
         '200':
-          description: page of lessons
+          description: page of plans
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageOfLessonGridDto"
+                $ref: "#/components/schemas/PageOfPlanGridDto"
     post:
-      summary: create lesson
-      operationId: createLesson
+      summary: create plan
+      operationId: createPlan
       tags:
-        - lesson
+        - plan
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateLessonRequest"
+              $ref: "#/components/schemas/CreatePlanRequest"
       responses:
         '201':
-          description: lesson created
+          description: plan created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LessonDetailedDto"
-  /api/v1/lesson/{lessonId}:
+                $ref: "#/components/schemas/PlanDetailedDto"
+  /api/v1/plan/{planId}:
     get:
-      summary: get lesson by id
-      operationId: getLessonById
+      summary: get plan by id
+      operationId: getPlanById
       tags:
-        - lesson
+        - plan
       parameters:
-        - name: lessonId
+        - name: planId
           in: path
           required: true
-          description: the id of the lesson
+          description: the id of the plan
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: lesson
+          description: plan
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LessonDetailedDto"
+                $ref: "#/components/schemas/PlanDetailedDto"
     put:
-      summary: update lesson by id
-      operationId: updateLessonById
+      summary: update plan by id
+      operationId: updatePlanById
       tags:
-        - lesson
+        - plan
       parameters:
-        - name: lessonId
+        - name: planId
           in: path
           required: true
-          description: the id of the lesson
+          description: the id of the plan
           schema:
             type: integer
             format: int64
@@ -340,62 +340,62 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateLessonRequest"
+              $ref: "#/components/schemas/UpdatePlanRequest"
       responses:
         '200':
-          description: updated lesson
+          description: updated plan
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LessonDetailedDto"
+                $ref: "#/components/schemas/PlanDetailedDto"
     delete:
-      summary: delete lesson by id
-      operationId: deleteLessonById
+      summary: delete plan by id
+      operationId: deletePlanById
       tags:
-        - lesson
+        - plan
       parameters:
-        - name: lessonId
+        - name: planId
           in: path
           required: true
-          description: the id of the lesson
+          description: the id of the plan
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: lesson deleted
-  /api/v1/lesson/{lessonId}/tag:
+          description: plan deleted
+  /api/v1/plan/{planId}/tag:
     get:
-      summary: get tags by lesson id
-      operationId: getTagsByLessonId
+      summary: get tags by plan id
+      operationId: getTagsByPlanId
       tags:
-        - lesson
+        - plan
       parameters:
-        - name: lessonId
+        - name: planId
           in: path
           required: true
-          description: the id of the lesson
+          description: the id of the plan
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: lesson
+          description: plan
           content:
             application/json:
               schema:
                 type: array
                 $ref: "#/components/schemas/ListOfTagDto"
     put:
-      summary: add tag to lesson
-      operationId: addTagToLesson
+      summary: add tag to plan
+      operationId: addTagToPlan
       tags:
-        - lesson
+        - plan
       parameters:
-        - name: lessonId
+        - name: planId
           in: path
           required: true
-          description: the id of the lesson
+          description: the id of the plan
           schema:
             type: integer
             format: int64
@@ -407,22 +407,22 @@ paths:
               $ref: "#/components/schemas/CreateTagRequest"
       responses:
         '200':
-          description: lesson's list of tags after add one
+          description: plan's list of tags after add one
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ListOfTagDto"
-  /api/v1/lesson/{lessonId}/tag/{tagKey}:
+  /api/v1/plan/{planId}/tag/{tagKey}:
     delete:
-      summary: remove tag from lesson
-      operationId: removeTagFromLesson
+      summary: remove tag from plan
+      operationId: removeTagFromPlan
       tags:
-        - lesson
+        - plan
       parameters:
-        - name: lessonId
+        - name: planId
           in: path
           required: true
-          description: the id of the lesson
+          description: the id of the plan
           schema:
             type: integer
             format: int64
@@ -437,22 +437,22 @@ paths:
             pattern: '^[0-9a-zA-Z-_]+$'
       responses:
         '200':
-          description: lesson's list of tags after remove one
+          description: plan's list of tags after remove one
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ListOfTagDto"
-  /api/v1/lesson/{lessonId}/phrase:
+  /api/v1/plan/{planId}/phrase:
     put:
-      summary: add phrase to lesson
-      operationId: addPhraseToLesson
+      summary: add phrase to plan
+      operationId: addPhraseToPlan
       tags:
-        - lesson
+        - plan
       parameters:
-        - name: lessonId
+        - name: planId
           in: path
           required: true
-          description: the id of the lesson
+          description: the id of the plan
           schema:
             type: integer
             format: int64
@@ -464,22 +464,22 @@ paths:
               $ref: "#/components/schemas/CreatePhraseRequest"
       responses:
         '200':
-          description: phrase is added to lesson
+          description: phrase is added to plan
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LessonDetailedDto"
-  /api/v1/lesson/{lessonId}/phrase/{phraseId}:
+                $ref: "#/components/schemas/PlanDetailedDto"
+  /api/v1/plan/{planId}/phrase/{phraseId}:
     put:
-      summary: update phrase in lesson
-      operationId: updatePhraseInLesson
+      summary: update phrase in plan
+      operationId: updatePhraseInPlan
       tags:
-        - lesson
+        - plan
       parameters:
-        - name: lessonId
+        - name: planId
           in: path
           required: true
-          description: the id of the lesson
+          description: the id of the plan
           schema:
             type: integer
             format: int64
@@ -502,17 +502,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LessonDetailedDto"
+                $ref: "#/components/schemas/PlanDetailedDto"
     delete:
-      summary: remove phrase from lesson
-      operationId: removePhraseFromLesson
+      summary: remove phrase from plan
+      operationId: removePhraseFromPlan
       tags:
-        - lesson
+        - plan
       parameters:
-        - name: lessonId
+        - name: planId
           in: path
           required: true
-          description: the id of the lesson
+          description: the id of the plan
           schema:
             type: integer
             format: int64
@@ -525,11 +525,11 @@ paths:
             format: int64
       responses:
         '200':
-          description: lesson after remove phrase
+          description: plan after remove phrase
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LessonDetailedDto"
+                $ref: "#/components/schemas/PlanDetailedDto"
 components:
   schemas:
     DemoTypeDto:
@@ -615,7 +615,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-        lessonId:
+        planId:
           type: integer
           format: int64
         source:
@@ -762,7 +762,7 @@ components:
           minLength: 1
           maxLength: 100
           pattern: '^[0-9a-zA-Z-_]+$'
-    LessonDetailedDto:
+    PlanDetailedDto:
       type: object
       required:
         - id
@@ -791,7 +791,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TagDto"
-    LessonGridDto:
+    PlanGridDto:
       type: object
       required:
         - id
@@ -816,7 +816,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TagDto"
-    PageOfLessonGridDto:
+    PageOfPlanGridDto:
       type: object
       required:
         - size
@@ -837,8 +837,8 @@ components:
         content:
           type: array
           items:
-            $ref: "#/components/schemas/LessonGridDto"
-    CreateLessonRequest:
+            $ref: "#/components/schemas/PlanGridDto"
+    CreatePlanRequest:
       type: object
       required:
         - description
@@ -850,7 +850,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/CreateTagRequest"
-    UpdateLessonRequest:
+    UpdatePlanRequest:
       type: object
       required:
         - description

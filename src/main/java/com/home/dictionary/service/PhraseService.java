@@ -40,7 +40,7 @@ public class PhraseService {
 
     public Phrase create(CreatePhraseRequest request) {
         var toSave = new Phrase();
-        toSave.setLesson(null);
+        toSave.setPlan(null);
         toSave.setSource(request.getSource());
         toSave.setSourceLang(langMapper.map(request.getSourceLang()));
         toSave.setTranscription(request.getTranscription());

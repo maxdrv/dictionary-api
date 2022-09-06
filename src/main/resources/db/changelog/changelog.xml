@@ -5,9 +5,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <include file="lesson/lesson.sql" relativeToChangelogFile="true"/>
+    <include file="plan/plan.sql" relativeToChangelogFile="true"/>
     <include file="phrase/phrase.sql" relativeToChangelogFile="true"/>
     <include file="tag/tag.sql" relativeToChangelogFile="true"/>
-    <include file="lesson/lesson_tag_mapping.sql" relativeToChangelogFile="true"/>
+    <include file="plan/plan_tag_mapping.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

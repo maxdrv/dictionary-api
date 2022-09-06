@@ -1,11 +1,11 @@
 package com.home.dictionary.api;
 
-import com.home.dictionary.mapper.LessonMapper;
+import com.home.dictionary.mapper.PlanMapper;
 import com.home.dictionary.mapper.PhraseMapper;
 import com.home.dictionary.mapper.TagMapper;
 import com.home.dictionary.openapi.api.ApiApiDelegate;
 import com.home.dictionary.openapi.model.*;
-import com.home.dictionary.service.LessonService;
+import com.home.dictionary.service.PlanService;
 import com.home.dictionary.service.PhraseService;
 import com.home.dictionary.service.TagService;
 import com.home.dictionary.util.PageableBuilder;
@@ -20,8 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ApiDelegateImpl implements ApiApiDelegate {
 
-    private final LessonService lessonService;
-    private final LessonMapper lessonMapper;
+    private final PlanService planService;
+    private final PlanMapper planMapper;
     private final TagService tagService;
     private final TagMapper tagMapper;
     private final PhraseService phraseService;
@@ -102,7 +102,7 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     }
 
     @Override
-    public ResponseEntity<PageOfLessonGridDto> getLessons(
+    public ResponseEntity<PageOfPlanGridDto> getPlans(
             String description,
             List<String> tags,
             Integer page,
@@ -110,76 +110,76 @@ public class ApiDelegateImpl implements ApiApiDelegate {
             String sort
     ) {
         var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
-        var result = lessonService.getPage(pageable);
-        var pageOfLessonGridDto = new PageOfLessonGridDto()
+        var result = planService.getPage(pageable);
+        var pageOfPlanGridDto = new PageOfPlanGridDto()
                 .size(result.getSize())
                 .number(result.getNumber())
                 .totalElements(result.getTotalElements())
                 .totalPages(result.getTotalPages())
-                .content(result.getContent().stream().map(lessonMapper::toGridDto).toList());
-        return ResponseEntity.ok(pageOfLessonGridDto);
+                .content(result.getContent().stream().map(planMapper::toGridDto).toList());
+        return ResponseEntity.ok(pageOfPlanGridDto);
     }
 
     @Override
-    public ResponseEntity<LessonDetailedDto> getLessonById(Long lessonId) {
-        var entity = lessonService.getLessonByIdOrThrow(lessonId);
-        return ResponseEntity.ok(lessonMapper.toDetailedDto(entity));
+    public ResponseEntity<PlanDetailedDto> getPlanById(Long planId) {
+        var entity = planService.getPlanByIdOrThrow(planId);
+        return ResponseEntity.ok(planMapper.toDetailedDto(entity));
     }
 
     @Override
-    public ResponseEntity<LessonDetailedDto> createLesson(CreateLessonRequest createLessonRequest) {
-        var entity = lessonService.createLesson(createLessonRequest);
-        return new ResponseEntity<>(lessonMapper.toDetailedDto(entity), HttpStatus.CREATED);
+    public ResponseEntity<PlanDetailedDto> createPlan(CreatePlanRequest createPlanRequest) {
+        var entity = planService.createPlan(createPlanRequest);
+        return new ResponseEntity<>(planMapper.toDetailedDto(entity), HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<LessonDetailedDto> updateLessonById(Long lessonId, UpdateLessonRequest updateLessonRequest) {
-        var entity = lessonService.updateLesson(lessonId, updateLessonRequest);
-        return ResponseEntity.ok(lessonMapper.toDetailedDto(entity));
+    public ResponseEntity<PlanDetailedDto> updatePlanById(Long planId, UpdatePlanRequest updatePlanRequest) {
+        var entity = planService.updatePlan(planId, updatePlanRequest);
+        return ResponseEntity.ok(planMapper.toDetailedDto(entity));
     }
 
     @Override
-    public ResponseEntity<Void> deleteLessonById(Long lessonId) {
-        lessonService.deleteById(lessonId);
+    public ResponseEntity<Void> deletePlanById(Long planId) {
+        planService.deleteById(planId);
         return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<ListOfTagDto> getTagsByLessonId(Long lessonId) {
-        var listOfTags = tagService.getTagsByLessonId(lessonId);
+    public ResponseEntity<ListOfTagDto> getTagsByPlanId(Long planId) {
+        var listOfTags = tagService.getTagsByPlanId(planId);
         var listOfTagDto = new ListOfTagDto();
         listOfTagDto.content(listOfTags.stream().map(tagMapper::map).toList());
         return ResponseEntity.ok(listOfTagDto);
     }
 
     @Override
-    public ResponseEntity<ListOfTagDto> addTagToLesson(Long lessonId, CreateTagRequest createTagRequest) {
-        lessonService.addTagToLesson(lessonId, createTagRequest);
-        return getTagsByLessonId(lessonId);
+    public ResponseEntity<ListOfTagDto> addTagToPlan(Long planId, CreateTagRequest createTagRequest) {
+        planService.addTagToPlan(planId, createTagRequest);
+        return getTagsByPlanId(planId);
     }
 
     @Override
-    public ResponseEntity<ListOfTagDto> removeTagFromLesson(Long lessonId, String tagKey) {
-        lessonService.removeTagFromLesson(lessonId, tagKey);
-        return getTagsByLessonId(lessonId);
+    public ResponseEntity<ListOfTagDto> removeTagFromPlan(Long planId, String tagKey) {
+        planService.removeTagFromPlan(planId, tagKey);
+        return getTagsByPlanId(planId);
     }
 
     @Override
-    public ResponseEntity<LessonDetailedDto> addPhraseToLesson(Long lessonId, CreatePhraseRequest createPhraseRequest) {
-        var entity = lessonService.addPhraseToLesson(lessonId, createPhraseRequest);
-        return ResponseEntity.ok(lessonMapper.toDetailedDto(entity));
+    public ResponseEntity<PlanDetailedDto> addPhraseToPlan(Long planId, CreatePhraseRequest createPhraseRequest) {
+        var entity = planService.addPhraseToPlan(planId, createPhraseRequest);
+        return ResponseEntity.ok(planMapper.toDetailedDto(entity));
     }
 
     @Override
-    public ResponseEntity<LessonDetailedDto> updatePhraseInLesson(Long lessonId, Long phraseId, UpdatePhraseRequest updatePhraseRequest) {
-        var entity = lessonService.updatePhraseInLesson(lessonId, phraseId, updatePhraseRequest);
-        return ResponseEntity.ok(lessonMapper.toDetailedDto(entity));
+    public ResponseEntity<PlanDetailedDto> updatePhraseInPlan(Long planId, Long phraseId, UpdatePhraseRequest updatePhraseRequest) {
+        var entity = planService.updatePhraseInPlan(planId, phraseId, updatePhraseRequest);
+        return ResponseEntity.ok(planMapper.toDetailedDto(entity));
     }
 
     @Override
-    public ResponseEntity<LessonDetailedDto> removePhraseFromLesson(Long lessonId, Long phraseId) {
-        var entity = lessonService.removePhraseFromLesson(lessonId, phraseId);
-        return ResponseEntity.ok(lessonMapper.toDetailedDto(entity));
+    public ResponseEntity<PlanDetailedDto> removePhraseFromPlan(Long planId, Long phraseId) {
+        var entity = planService.removePhraseFromPlan(planId, phraseId);
+        return ResponseEntity.ok(planMapper.toDetailedDto(entity));
     }
 
 }

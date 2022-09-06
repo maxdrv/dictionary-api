@@ -1,6 +1,6 @@
 package com.home.dictionary.model.tag;
 
-import com.home.dictionary.model.lesson.Lesson;
+import com.home.dictionary.model.plan.Plan;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +36,6 @@ public class Tag {
     private String key;
 
     @ManyToMany(mappedBy = "tags")
-    private Set<Lesson> lessons;
+    private Set<Plan> plans;
 
 }

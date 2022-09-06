@@ -1,6 +1,6 @@
 package com.home.dictionary.model.phrase;
 
-import com.home.dictionary.model.lesson.Lesson;
+import com.home.dictionary.model.plan.Plan;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,8 +33,8 @@ public class Phrase {
     private Instant updatedAt;
 
     @ManyToOne
-    @JoinColumn(name = "lesson_id")
-    private Lesson lesson;
+    @JoinColumn(name = "plan_id")
+    private Plan plan;
 
     private String source;
 
