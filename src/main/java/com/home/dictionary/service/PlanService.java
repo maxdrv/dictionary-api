@@ -115,7 +115,7 @@ public class PlanService {
         if (maybePhrase.isPresent()) {
             var phraseToDelete = maybePhrase.get();
             phraseToDelete.setPlan(null);
-            phraseService.deleteById(phraseToDelete.getId());
+            phraseService.deleteById(phraseToDelete.getId());  // TODO why it is not working?
         }
 
         return getPlanByIdOrThrow(plan.getId());
