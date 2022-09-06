@@ -530,6 +530,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PlanDetailedDto"
+  /api/v1/plan/{planId}/startLesson:
+    post:
+      summary: start lesson from plan
+      operationId: startLessonFromPlan
+      tags:
+        - lesson
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: the id of the plan
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: first question for this lesson
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NextQuestionDto"
 components:
   schemas:
     DemoTypeDto:
@@ -857,5 +878,28 @@ components:
       properties:
         description:
           type: string
-
+    NextQuestionDto:
+      type: object
+      required:
+        - lessonId
+        - hasQuestion
+      properties:
+        lessonId:
+          type: integer
+          format: int64
+        hasQuestion:
+          type: boolean
+        question:
+          $ref: "#/components/schemas/QuestionDto"
+    QuestionDto:
+      type: object
+      required:
+        - lessonItemId
+        - question
+      properties:
+        lessonItemId:
+          type: integer
+          format: int64
+        question:
+          type: string
 

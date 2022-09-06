@@ -1,5 +1,6 @@
 package com.home.dictionary.api;
 
+import com.home.dictionary.facade.LessonFacade;
 import com.home.dictionary.mapper.PlanMapper;
 import com.home.dictionary.mapper.PhraseMapper;
 import com.home.dictionary.mapper.TagMapper;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ApiDelegateImpl implements ApiApiDelegate {
 
+    private final LessonFacade lessonFacade;
     private final PlanService planService;
     private final PlanMapper planMapper;
     private final TagService tagService;
@@ -180,6 +182,12 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     public ResponseEntity<PlanDetailedDto> removePhraseFromPlan(Long planId, Long phraseId) {
         var entity = planService.removePhraseFromPlan(planId, phraseId);
         return ResponseEntity.ok(planMapper.toDetailedDto(entity));
+    }
+
+    @Override
+    public ResponseEntity<NextQuestionDto> startLessonFromPlan(Long planId) {
+        var nextQuestionDto = lessonFacade.startLessonFromPlan(planId);
+        return ResponseEntity.ok(nextQuestionDto);
     }
 
 }
