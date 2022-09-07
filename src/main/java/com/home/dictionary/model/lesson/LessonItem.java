@@ -41,6 +41,8 @@ public class LessonItem {
 
     private Long parentPhraseId;
 
+    private Integer itemOrder;
+
     private String question;
 
     private String answerCorrect;

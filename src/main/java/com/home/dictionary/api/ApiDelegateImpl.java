@@ -1,21 +1,24 @@
 package com.home.dictionary.api;
 
 import com.home.dictionary.facade.LessonFacade;
-import com.home.dictionary.mapper.PlanMapper;
 import com.home.dictionary.mapper.PhraseMapper;
+import com.home.dictionary.mapper.PlanMapper;
 import com.home.dictionary.mapper.TagMapper;
 import com.home.dictionary.openapi.api.ApiApiDelegate;
 import com.home.dictionary.openapi.model.*;
-import com.home.dictionary.service.PlanService;
 import com.home.dictionary.service.PhraseService;
+import com.home.dictionary.service.PlanService;
 import com.home.dictionary.service.TagService;
+import com.home.dictionary.service.order.OrderStrategyType;
 import com.home.dictionary.util.PageableBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -185,8 +188,9 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     }
 
     @Override
-    public ResponseEntity<NextQuestionDto> startLessonFromPlan(Long planId) {
-        var nextQuestionDto = lessonFacade.startLessonFromPlan(planId);
+    public ResponseEntity<NextQuestionDto> startLessonFromPlan(Long planId, @Nullable OrderStrategyTypeDto orderStrategyType) {
+        var orderStrategyTypeDto = Optional.ofNullable(orderStrategyType).orElse(OrderStrategyTypeDto.NATURAL);
+        var nextQuestionDto = lessonFacade.startLessonFromPlan(planId, orderStrategyTypeDto);
         return ResponseEntity.ok(nextQuestionDto);
     }
 

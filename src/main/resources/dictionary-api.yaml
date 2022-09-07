@@ -544,6 +544,11 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: orderStrategy
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/OrderStrategyTypeDto"
       responses:
         '200':
           description: first question for this lesson
@@ -902,4 +907,8 @@ components:
           format: int64
         question:
           type: string
-
+    OrderStrategyTypeDto:
+      type: string
+      enum:
+        - NATURAL
+        - REVERSE

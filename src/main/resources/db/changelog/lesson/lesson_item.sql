@@ -9,6 +9,7 @@ create table if not exists lesson_item
     status           text        not null,
     lesson_id        bigint      not null,
     parent_phrase_id bigint      not null,
+    item_order       integer     not null,
     question         text        not null,
     answer_correct   text        not null,
     answer_user      text,
