@@ -1,14 +1,13 @@
 package com.home.dictionary.api;
 
 import com.home.dictionary.facade.LessonFacade;
+import com.home.dictionary.facade.TagFacade;
 import com.home.dictionary.mapper.PhraseMapper;
 import com.home.dictionary.mapper.PlanMapper;
-import com.home.dictionary.mapper.TagMapper;
 import com.home.dictionary.openapi.api.ApiApiDelegate;
 import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.service.PhraseService;
 import com.home.dictionary.service.PlanService;
-import com.home.dictionary.service.TagService;
 import com.home.dictionary.util.PageableBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,8 +25,7 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     private final LessonFacade lessonFacade;
     private final PlanService planService;
     private final PlanMapper planMapper;
-    private final TagService tagService;
-    private final TagMapper tagMapper;
+    private final TagFacade tagFacade;
     private final PhraseService phraseService;
     private final PhraseMapper phraseMapper;
 
@@ -71,37 +69,28 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     @Override
     public ResponseEntity<PageOfTagDto> getTags(Integer page, Integer size, String sort) {
         var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
-        var result = tagService.getPage(pageable);
-        var pageOfTags = new PageOfTagDto()
-                .size(result.getSize())
-                .number(result.getNumber())
-                .totalElements(result.getTotalElements())
-                .totalPages(result.getTotalPages())
-                .content(result.getContent().stream().map(tagMapper::map).toList());
+        var pageOfTags = tagFacade.page(pageable);
         return ResponseEntity.ok(pageOfTags);
     }
 
     @Override
     public ResponseEntity<TagDto> getTagByKey(String tagKey) {
-        var entity = tagService.getTagByKeyOrThrow(tagKey);
-        return ResponseEntity.ok(tagMapper.map(entity));
+        return ResponseEntity.ok(tagFacade.getTagByKeyOrThrow(tagKey));
     }
 
     @Override
     public ResponseEntity<TagDto> createTag(CreateTagRequest createTagRequest) {
-        var entity = tagService.createTag(createTagRequest);
-        return new ResponseEntity<>(tagMapper.map(entity), HttpStatus.CREATED);
+        return new ResponseEntity<>(tagFacade.createTag(createTagRequest), HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<TagDto> updateTagByKey(String tagKey, UpdateTagRequest updateTagRequest) {
-        var entity = tagService.updateTag(tagKey, updateTagRequest);
-        return ResponseEntity.ok(tagMapper.map(entity));
+        return ResponseEntity.ok(tagFacade.updateTagByKey(tagKey, updateTagRequest));
     }
 
     @Override
     public ResponseEntity<Void> deleteTagByKey(String tagKey) {
-        tagService.deleteByKey(tagKey);
+        tagFacade.deleteTagByKey(tagKey);
         return ResponseEntity.ok().build();
     }
 
@@ -150,10 +139,7 @@ public class ApiDelegateImpl implements ApiApiDelegate {
 
     @Override
     public ResponseEntity<ListOfTagDto> getTagsByPlanId(Long planId) {
-        var listOfTags = tagService.getTagsByPlanId(planId);
-        var listOfTagDto = new ListOfTagDto();
-        listOfTagDto.content(listOfTags.stream().map(tagMapper::map).toList());
-        return ResponseEntity.ok(listOfTagDto);
+        return ResponseEntity.ok(tagFacade.getTagsByPlanId(planId));
     }
 
     @Override
