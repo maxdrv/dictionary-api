@@ -1,6 +1,5 @@
 package com.home.dictionary.model.lesson;
 
-import com.home.dictionary.model.plan.Plan;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

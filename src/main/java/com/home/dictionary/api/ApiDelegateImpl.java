@@ -9,7 +9,6 @@ import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.service.PhraseService;
 import com.home.dictionary.service.PlanService;
 import com.home.dictionary.service.TagService;
-import com.home.dictionary.service.order.OrderStrategyType;
 import com.home.dictionary.util.PageableBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -192,6 +191,18 @@ public class ApiDelegateImpl implements ApiApiDelegate {
         var orderStrategyTypeDto = Optional.ofNullable(orderStrategyType).orElse(OrderStrategyTypeDto.NATURAL);
         var nextQuestionDto = lessonFacade.startLessonFromPlan(planId, orderStrategyTypeDto);
         return ResponseEntity.ok(nextQuestionDto);
+    }
+
+    @Override
+    public ResponseEntity<PageOfLessonDto> getLessons(Integer page, Integer size, String sort) {
+        var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
+        return ResponseEntity.ok(lessonFacade.getPage(pageable));
+    }
+
+    @Override
+    public ResponseEntity<NextQuestionDto> answerTheQuestion(Long lessonId, AnswerDto answerDto) {
+
+        return ApiApiDelegate.super.answerTheQuestion(lessonId, answerDto);
     }
 
 }

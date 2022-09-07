@@ -12,6 +12,8 @@ import com.home.dictionary.service.order.OrderStrategyType;
 import com.home.dictionary.util.Comparators;
 import lombok.RequiredArgsConstructor;
 import one.util.streamex.StreamEx;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,10 @@ public class LessonService {
     private final EntityManager entityManager;
     private final Clock clock;
     private final OrderStrategies orderStrategies;
+
+    public Page<Lesson> getPage(Pageable pageable) {
+        return lessonRepository.findAll(pageable);
+    }
 
     public Optional<Lesson> getLessonById(Long lessonId) {
         return lessonRepository.findById(lessonId);

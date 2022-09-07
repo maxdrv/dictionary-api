@@ -556,6 +556,64 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NextQuestionDto"
+  /api/v1/lesson:
+    get:
+      summary: get lessons by filter
+      operationId: getLessons
+      tags:
+        - lesson
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: page of lessons
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageOfLessonDto"
+  /api/v1/lesson/{lessonId}/answer:
+    post:
+      summary: answer the question
+      operationId: answerTheQuestion
+      tags:
+        - lesson
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          description: the id of the lesson
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnswerDto"
+      responses:
+        '200':
+          description: next question of lesson
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NextQuestionDto"
 components:
   schemas:
     DemoTypeDto:
@@ -907,8 +965,122 @@ components:
           format: int64
         question:
           type: string
+    AnswerDto:
+      type: object
+      required:
+        - lessonItemId
+        - answer
+      properties:
+        lessonItemId:
+          type: integer
+          format: int64
+        asnwer:
+          type: string
     OrderStrategyTypeDto:
       type: string
       enum:
         - NATURAL
         - REVERSE
+    PageOfLessonDto:
+      type: object
+      required:
+        - size
+        - numeber
+        - totalElements
+        - totalPages
+        - content
+      properties:
+        size:
+          type: integer
+        number:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/LessonDto"
+    LessonDto:
+      type: object
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - startAt
+        - status
+        - parentPlanId
+        - description
+        - lessonItems
+      properties:
+        id:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        startAt:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/LessonStatusDto"
+        parentPlanId:
+          type: integer
+          format: int64
+        description:
+          type: string
+        lessonItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/LessonItemDto"
+    LessonItemDto:
+      type: object
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - status
+        - parentPhraseId
+        - itemOrder
+        - question
+        - answerCorrect
+      properties:
+        id:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/LessonItemStatusDto"
+        parentPhraseId:
+          type: integer
+          format: int64
+        itemOrder:
+          type: integer
+        question:
+          type: string
+        answerCorrect:
+          type: string
+        answerUser:
+          type: string
+    LessonStatusDto:
+      type: string
+      enum:
+        - NOT_STARTED
+        - STARTED
+        - FINISHED
+    LessonItemStatusDto:
+      type: string
+      enum:
+        - NOT_STARTED
+        - SUCCESS
+        - ERROR
