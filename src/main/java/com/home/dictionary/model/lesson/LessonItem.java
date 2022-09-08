@@ -1,17 +1,15 @@
 package com.home.dictionary.model.lesson;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Objects;
 
 @Getter
-@Setter
+@Setter(AccessLevel.PACKAGE)
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 
@@ -48,6 +46,28 @@ public class LessonItem {
     private String answerCorrect;
 
     @Nullable
+    @Setter(AccessLevel.PACKAGE)
     private String answerUser;
+
+    public LessonItem(Lesson lesson, Long parentPhraseId, Integer itemOrder, String question, String answerCorrect) {
+        this.lesson = lesson;
+        this.status = LessonItemStatus.NOT_STARTED;
+        this.parentPhraseId = parentPhraseId;
+        this.itemOrder = itemOrder;
+        this.question = question;
+        this.answerCorrect = answerCorrect;
+    }
+
+    public void acceptAnswer(String answer) {
+        if (Objects.equals(answer, answerUser)) {
+            return;
+        }
+        setAnswerUser(answer);
+        if (Objects.equals(answerUser, answerCorrect)) {
+            setStatus(LessonItemStatus.CORRECT);
+        } else {
+            setStatus(LessonItemStatus.ERROR);
+        }
+    }
 
 }

@@ -1,16 +1,16 @@
 package com.home.dictionary.facade;
 
+import com.home.dictionary.exception.ApiEntityNotFoundException;
 import com.home.dictionary.mapper.LessonMapper;
-import com.home.dictionary.mapper.OrderStrategyMapper;
-import com.home.dictionary.model.lesson.LessonItem;
-import com.home.dictionary.model.lesson.LessonItemStatus;
+import com.home.dictionary.mapper.OrderStrategyTypeMapper;
 import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.service.LessonService;
 import lombok.RequiredArgsConstructor;
-import one.util.streamex.StreamEx;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
 
 @RequiredArgsConstructor
 
@@ -20,7 +20,8 @@ public class LessonFacade {
 
     private final LessonService lessonService;
     private final LessonMapper lessonMapper;
-    private final OrderStrategyMapper orderStrategyTypeMapper;
+    private final OrderStrategyTypeMapper orderStrategyTypeMapper;
+    private final EntityManager entityManager;
 
     public PageOfLessonDto getPage(Pageable pageable) {
         var result = lessonService.getPage(pageable);
@@ -37,32 +38,37 @@ public class LessonFacade {
         return nextQuestion(lesson.getId());
     }
 
-    public NextQuestionDto answerTheQuestion(Long lessonId, AnswerDto answer) {
+    public NextQuestionDto answerTheQuestion(Long lessonId, Long lessonItemId, AnswerDto answer) {
         var lesson = lessonService.getLessonByIdOrThrow(lessonId);
+        var item = lesson.findItemById(lessonItemId)
+                .orElseThrow(() -> new ApiEntityNotFoundException("item with id " + lessonItemId + " not found in lesson " + lessonId));
 
-        // TODO
+        lesson.tryToStart();
+        item.acceptAnswer(answer.getAnswer());
+        if (lesson.nextItem().isEmpty()) {
+            lesson.finish();
+        }
 
+        entityManager.flush();
         return nextQuestion(lesson.getId());
     }
 
     public NextQuestionDto nextQuestion(Long lessonId) {
         var lesson = lessonService.getLessonByIdOrThrow(lessonId);
 
-        var lessonItem = StreamEx.of(lesson.getLessonItems())
-                .sortedBy(LessonItem::getItemOrder)
-                .findFirst(item -> item.getStatus() == LessonItemStatus.NOT_STARTED)
-                .orElse(null);
+        var maybeLessonItem = lesson.nextItem();
 
         var nextQuestion = new NextQuestionDto()
                 .lessonId(lesson.getId())
-                .hasQuestion(lessonItem != null);
+                .hasQuestion(maybeLessonItem.isPresent());
 
-        if (lessonItem != null) {
-            var questionDto = new QuestionDto()
-                    .lessonItemId(lessonItem.getId())
-                    .question(lessonItem.getQuestion());
-            nextQuestion.question(questionDto);
-        }
+        maybeLessonItem.ifPresent(item -> {
+            nextQuestion.question(
+                    new QuestionDto()
+                            .lessonItemId(item.getId())
+                            .question(item.getQuestion())
+            );
+        });
 
         return nextQuestion;
     }

@@ -186,9 +186,8 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     }
 
     @Override
-    public ResponseEntity<NextQuestionDto> answerTheQuestion(Long lessonId, AnswerDto answerDto) {
-
-        return ApiApiDelegate.super.answerTheQuestion(lessonId, answerDto);
+    public ResponseEntity<NextQuestionDto> answerTheQuestion(Long lessonId, Long lessonItemId, AnswerDto answerDto) {
+        return ResponseEntity.ok(lessonFacade.answerTheQuestion(lessonId, lessonItemId, answerDto));
     }
 
 }

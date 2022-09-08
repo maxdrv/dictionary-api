@@ -3,8 +3,6 @@ package com.home.dictionary.service;
 import com.home.dictionary.exception.ApiEntityNotFoundException;
 import com.home.dictionary.model.lesson.Lesson;
 import com.home.dictionary.model.lesson.LessonItem;
-import com.home.dictionary.model.lesson.LessonItemStatus;
-import com.home.dictionary.model.lesson.LessonStatus;
 import com.home.dictionary.model.phrase.Phrase;
 import com.home.dictionary.repository.LessonRepository;
 import com.home.dictionary.service.order.OrderStrategies;
@@ -50,11 +48,7 @@ public class LessonService {
     public Lesson createLessonFromPlan(Long planId, OrderStrategyType orderStrategyType) {
         var plan = planService.getPlanByIdOrThrow(planId);
 
-        var lesson = new Lesson();
-        lesson.setStartAt(clock.instant());
-        lesson.setStatus(LessonStatus.NOT_STARTED);
-        lesson.setParentPlanId(plan.getId());
-        lesson.setDescription(plan.getDescription());
+        var lesson = new Lesson(clock.instant(), plan.getId(), plan.getDescription());
         var savedLesson = lessonRepository.save(lesson);
 
         var orderStrategy = orderStrategies.getByType(orderStrategyType);
@@ -65,15 +59,13 @@ public class LessonService {
         var lessonItems = StreamEx.of(iterator)
                 .map(phraseAndOrder -> {
                     var phrase = phraseAndOrder.phrase();
-
-                    var item = new LessonItem();
-                    item.setLesson(savedLesson);
-                    item.setStatus(LessonItemStatus.NOT_STARTED);
-                    item.setParentPhraseId(phrase.getId());
-                    item.setItemOrder(phraseAndOrder.order());
-                    item.setQuestion("translate phrase [" + phrase.getSource() + "] from " + phrase.getSourceLang() + " to " + phrase.getTargetLang());
-                    item.setAnswerCorrect(phrase.getTarget());
-                    return item;
+                    return new LessonItem(
+                            savedLesson,
+                            phrase.getId(),
+                            phraseAndOrder.order(),
+                            "translate phrase [" + phrase.getSource() + "] from " + phrase.getSourceLang() + " to " + phrase.getTargetLang(),
+                            phrase.getTarget()
+                    );
                 })
                 .toList();
 

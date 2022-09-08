@@ -587,7 +587,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageOfLessonDto"
-  /api/v1/lesson/{lessonId}/answer:
+  /api/v1/lesson/{lessonId}/item/{lessonItemId}/answer:
     post:
       summary: answer the question
       operationId: answerTheQuestion
@@ -598,6 +598,13 @@ paths:
           in: path
           required: true
           description: the id of the lesson
+          schema:
+            type: integer
+            format: int64
+        - name: lessonItemId
+          in: path
+          required: true
+          description: the id of the lesson item
           schema:
             type: integer
             format: int64
@@ -968,13 +975,9 @@ components:
     AnswerDto:
       type: object
       required:
-        - lessonItemId
         - answer
       properties:
-        lessonItemId:
-          type: integer
-          format: int64
-        asnwer:
+        answer:
           type: string
     OrderStrategyTypeDto:
       type: string
@@ -1082,5 +1085,5 @@ components:
       type: string
       enum:
         - NOT_STARTED
-        - SUCCESS
+        - CORRECT
         - ERROR
