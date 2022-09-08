@@ -1,12 +1,11 @@
 package com.home.dictionary.api;
 
 import com.home.dictionary.facade.LessonFacade;
+import com.home.dictionary.facade.PhraseFacade;
 import com.home.dictionary.facade.TagFacade;
-import com.home.dictionary.mapper.PhraseMapper;
 import com.home.dictionary.mapper.PlanMapper;
 import com.home.dictionary.openapi.api.ApiApiDelegate;
 import com.home.dictionary.openapi.model.*;
-import com.home.dictionary.service.PhraseService;
 import com.home.dictionary.service.PlanService;
 import com.home.dictionary.util.PageableBuilder;
 import lombok.RequiredArgsConstructor;
@@ -26,51 +25,39 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     private final PlanService planService;
     private final PlanMapper planMapper;
     private final TagFacade tagFacade;
-    private final PhraseService phraseService;
-    private final PhraseMapper phraseMapper;
+    private final PhraseFacade phraseFacade;
 
     @Override
     public ResponseEntity<PageOfPhraseDto> getPhrases(Integer page, Integer size, String sort) {
         var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
-        var result = phraseService.getPage(pageable);
-        var pageOfPhrases = new PageOfPhraseDto()
-                .size(result.getSize())
-                .number(result.getNumber())
-                .totalElements(result.getTotalElements())
-                .totalPages(result.getTotalPages())
-                .content(result.getContent().stream().map(phraseMapper::map).toList());
-        return ResponseEntity.ok(pageOfPhrases);
+        return ResponseEntity.ok(phraseFacade.getPage(pageable));
     }
 
     @Override
     public ResponseEntity<PhraseDto> getPhraseById(Long phraseId) {
-        var entity = phraseService.getPhraseByIdOrThrow(phraseId);
-        return ResponseEntity.ok(phraseMapper.map(entity));
+        return ResponseEntity.ok(phraseFacade.getPhraseByIdOrThrow(phraseId));
     }
 
     @Override
     public ResponseEntity<PhraseDto> createPhrase(CreatePhraseRequest createPhraseRequest) {
-        var entity = phraseService.create(createPhraseRequest);
-        return new ResponseEntity<>(phraseMapper.map(entity), HttpStatus.CREATED);
+        return new ResponseEntity<>(phraseFacade.createPhrase(createPhraseRequest), HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<PhraseDto> updatePhrase(Long phraseId, UpdatePhraseRequest updatePhraseRequest) {
-        var entity = phraseService.update(phraseId, updatePhraseRequest);
-        return ResponseEntity.ok(phraseMapper.map(entity));
+        return ResponseEntity.ok(phraseFacade.updatePhraseById(phraseId, updatePhraseRequest));
     }
 
     @Override
     public ResponseEntity<Void> deletePhraseById(Long phraseId) {
-        phraseService.deleteById(phraseId);
+        phraseFacade.deletePhraseById(phraseId);
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<PageOfTagDto> getTags(Integer page, Integer size, String sort) {
         var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
-        var pageOfTags = tagFacade.page(pageable);
-        return ResponseEntity.ok(pageOfTags);
+        return ResponseEntity.ok(tagFacade.page(pageable));
     }
 
     @Override
