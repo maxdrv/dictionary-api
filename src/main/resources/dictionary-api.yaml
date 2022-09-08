@@ -411,7 +411,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ListOfTagDto"
+                $ref: "#/components/schemas/PlanDetailedDto"
   /api/v1/plan/{planId}/tag/{tagKey}:
     delete:
       summary: remove tag from plan
@@ -441,7 +441,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ListOfTagDto"
+                $ref: "#/components/schemas/PlanDetailedDto"
   /api/v1/plan/{planId}/phrase:
     put:
       summary: add phrase to plan

@@ -62,25 +62,25 @@ public class PlanService {
         planRepository.deleteById(planId);
     }
 
-    public void addTagToPlan(Long planId, CreateTagRequest createTagRequest) {
+    public Plan addTagToPlan(Long planId, CreateTagRequest createTagRequest) {
         var tag = tagService.createTag(createTagRequest);
 
         var toUpdated = getPlanByIdOrThrow(planId);
         toUpdated.getTags().add(tag);
 
-        entityManager.flush();
+        return planRepository.save(toUpdated);
     }
 
-    public void removeTagFromPlan(Long planId, String tagKey) {
-        var toUpdated = getPlanByIdOrThrow(planId);
+    public Plan removeTagFromPlan(Long planId, String tagKey) {
+        var toUpdate = getPlanByIdOrThrow(planId);
 
-        var newSetOfTags = StreamEx.of(toUpdated.getTags())
+        var newSetOfTags = StreamEx.of(toUpdate.getTags())
                 .removeBy(Tag::getKey, tagKey)
                 .toSet();
 
-        toUpdated.setTags(newSetOfTags);
+        toUpdate.setTags(newSetOfTags);
 
-        entityManager.flush();
+        return planRepository.save(toUpdate);
     }
 
     public Plan addPhraseToPlan(Long planId, CreatePhraseRequest createPhraseRequest) {
