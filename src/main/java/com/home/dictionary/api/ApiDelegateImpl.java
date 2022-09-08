@@ -143,6 +143,12 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     }
 
     @Override
+    public ResponseEntity<PageOfLessonDto> getLessons(Integer page, Integer size, String sort) {
+        var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
+        return ResponseEntity.ok(lessonFacade.getPage(pageable));
+    }
+
+    @Override
     public ResponseEntity<NextQuestionDto> startLessonFromPlan(Long planId, @Nullable OrderStrategyTypeDto orderStrategyType) {
         var orderStrategyTypeDto = Optional.ofNullable(orderStrategyType).orElse(OrderStrategyTypeDto.NATURAL);
         var nextQuestionDto = lessonFacade.startLessonFromPlan(planId, orderStrategyTypeDto);
@@ -150,9 +156,13 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     }
 
     @Override
-    public ResponseEntity<PageOfLessonDto> getLessons(Integer page, Integer size, String sort) {
-        var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
-        return ResponseEntity.ok(lessonFacade.getPage(pageable));
+    public ResponseEntity<LessonDto> getLessonById(Long lessonId) {
+        return ResponseEntity.ok(lessonFacade.getLessonById(lessonId));
+    }
+
+    @Override
+    public ResponseEntity<NextQuestionDto> getNextQuestionByLessonId(Long lessonId) {
+        return ResponseEntity.ok(lessonFacade.getNextQuestionByLessonId(lessonId));
     }
 
     @Override

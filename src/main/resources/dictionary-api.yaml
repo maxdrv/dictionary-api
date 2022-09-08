@@ -587,6 +587,48 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PageOfLessonDto"
+  /api/v1/lesson/{lessonId}:
+    get:
+      summary: get lesson by id
+      operationId: getLessonById
+      tags:
+        - lesson
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          description: the id of the lesson
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: lesson
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LessonDto"
+  /api/v1/lesson/{lessonId}/nextQuestion:
+    get:
+      summary: get next question by lesson id
+      operationId: getNextQuestionByLessonId
+      tags:
+        - lesson
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          description: the id of the lesson
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: next question of lesson
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NextQuestionDto"
   /api/v1/lesson/{lessonId}/item/{lessonItemId}/answer:
     post:
       summary: answer the question

@@ -33,27 +33,17 @@ public class LessonFacade {
                 .content(result.getContent().stream().map(lessonMapper::map).toList());
     }
 
+    public LessonDto getLessonById(Long lessonId) {
+        var entity = lessonService.getLessonByIdOrThrow(lessonId);
+        return lessonMapper.map(entity);
+    }
+
     public NextQuestionDto startLessonFromPlan(Long planId, OrderStrategyTypeDto orderStrategyTypeDto) {
         var lesson = lessonService.createLessonFromPlan(planId, orderStrategyTypeMapper.map(orderStrategyTypeDto));
-        return nextQuestion(lesson.getId());
+        return getNextQuestionByLessonId(lesson.getId());
     }
 
-    public NextQuestionDto answerTheQuestion(Long lessonId, Long lessonItemId, AnswerDto answer) {
-        var lesson = lessonService.getLessonByIdOrThrow(lessonId);
-        var item = lesson.findItemById(lessonItemId)
-                .orElseThrow(() -> new ApiEntityNotFoundException("item with id " + lessonItemId + " not found in lesson " + lessonId));
-
-        lesson.tryToStart();
-        item.acceptAnswer(answer.getAnswer());
-        if (lesson.nextItem().isEmpty()) {
-            lesson.finish();
-        }
-
-        entityManager.flush();
-        return nextQuestion(lesson.getId());
-    }
-
-    public NextQuestionDto nextQuestion(Long lessonId) {
+    public NextQuestionDto getNextQuestionByLessonId(Long lessonId) {
         var lesson = lessonService.getLessonByIdOrThrow(lessonId);
 
         var maybeLessonItem = lesson.nextItem();
@@ -71,6 +61,21 @@ public class LessonFacade {
         });
 
         return nextQuestion;
+    }
+
+    public NextQuestionDto answerTheQuestion(Long lessonId, Long lessonItemId, AnswerDto answer) {
+        var lesson = lessonService.getLessonByIdOrThrow(lessonId);
+        var item = lesson.findItemById(lessonItemId)
+                .orElseThrow(() -> new ApiEntityNotFoundException("item with id " + lessonItemId + " not found in lesson " + lessonId));
+
+        lesson.tryToStart();
+        item.acceptAnswer(answer.getAnswer());
+        if (lesson.nextItem().isEmpty()) {
+            lesson.finish();
+        }
+
+        entityManager.flush();
+        return getNextQuestionByLessonId(lesson.getId());
     }
 
 }
