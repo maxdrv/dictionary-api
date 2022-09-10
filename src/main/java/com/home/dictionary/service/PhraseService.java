@@ -3,6 +3,8 @@ package com.home.dictionary.service;
 import com.home.dictionary.exception.ApiEntityNotFoundException;
 import com.home.dictionary.mapper.LangMapper;
 import com.home.dictionary.model.phrase.Phrase;
+import com.home.dictionary.model.phrase.PhraseFilter;
+import com.home.dictionary.model.phrase.PhraseSpecification;
 import com.home.dictionary.openapi.model.CreatePhraseRequest;
 import com.home.dictionary.openapi.model.UpdatePhraseRequest;
 import com.home.dictionary.repository.PhraseRepository;
@@ -25,8 +27,8 @@ public class PhraseService {
     private final LangMapper langMapper;
     private final EntityManager entityManager;
 
-    public Page<Phrase> getPage(Pageable pageable) {
-        return phraseRepository.findAll(pageable);
+    public Page<Phrase> getPage(PhraseFilter filter, Pageable pageable) {
+        return phraseRepository.findAll(new PhraseSpecification(filter), pageable);
     }
 
     public Optional<Phrase> getPhraseById(Long phraseId) {

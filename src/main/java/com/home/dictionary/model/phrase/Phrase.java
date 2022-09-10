@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -32,6 +33,7 @@ public class Phrase {
     @Version
     private Instant updatedAt;
 
+    @Nullable
     @ManyToOne
     @JoinColumn(name = "plan_id")
     private Plan plan;

@@ -4,6 +4,7 @@ import com.home.dictionary.facade.LessonFacade;
 import com.home.dictionary.facade.PhraseFacade;
 import com.home.dictionary.facade.PlanFacade;
 import com.home.dictionary.facade.TagFacade;
+import com.home.dictionary.model.phrase.PhraseFilter;
 import com.home.dictionary.openapi.api.ApiApiDelegate;
 import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.util.PageableBuilder;
@@ -26,9 +27,9 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     private final PhraseFacade phraseFacade;
 
     @Override
-    public ResponseEntity<PageOfPhraseDto> getPhrases(Integer page, Integer size, String sort) {
+    public ResponseEntity<PageOfPhraseDto> getPhrases(Long planId, Integer page, Integer size, String sort) {
         var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
-        return ResponseEntity.ok(phraseFacade.getPage(pageable));
+        return ResponseEntity.ok(phraseFacade.getPage(new PhraseFilter(planId), pageable));
     }
 
     @Override

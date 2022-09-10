@@ -1,6 +1,7 @@
 package com.home.dictionary.facade;
 
 import com.home.dictionary.mapper.PhraseMapper;
+import com.home.dictionary.model.phrase.PhraseFilter;
 import com.home.dictionary.openapi.model.CreatePhraseRequest;
 import com.home.dictionary.openapi.model.PageOfPhraseDto;
 import com.home.dictionary.openapi.model.PhraseDto;
@@ -20,8 +21,8 @@ public class PhraseFacade {
     private final PhraseService phraseService;
     private final PhraseMapper phraseMapper;
 
-    public PageOfPhraseDto getPage(Pageable pageable) {
-        var result = phraseService.getPage(pageable);
+    public PageOfPhraseDto getPage(PhraseFilter filter, Pageable pageable) {
+        var result = phraseService.getPage(filter, pageable);
         return new PageOfPhraseDto()
                 .size(result.getSize())
                 .number(result.getNumber())
