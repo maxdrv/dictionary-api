@@ -635,6 +635,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NextQuestionDto"
+  /api/v1/lesson/{lessonId}/item:
+    get:
+      summary: get lesson items by lesson id
+      operationId: getLessonItemsByLessonId
+      tags:
+        - lesson
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          description: the id of the lesson
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: next question of lesson
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageOfLessonItemDto"
   /api/v1/lesson/{lessonId}/item/{lessonItemId}/answer:
     post:
       summary: answer the question
@@ -1086,6 +1107,28 @@ components:
         description:
           type: string
         lessonItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/LessonItemDto"
+    PageOfLessonItemDto:
+      type: object
+      required:
+        - size
+        - numeber
+        - totalElements
+        - totalPages
+        - content
+      properties:
+        size:
+          type: integer
+        number:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        content:
           type: array
           items:
             $ref: "#/components/schemas/LessonItemDto"

@@ -5,6 +5,7 @@ import com.home.dictionary.mapper.LessonMapper;
 import com.home.dictionary.mapper.OrderStrategyTypeMapper;
 import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.service.LessonService;
+import com.home.dictionary.util.PageableUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,16 @@ public class LessonFacade {
     public LessonDto getLessonById(Long lessonId) {
         var entity = lessonService.getLessonByIdOrThrow(lessonId);
         return lessonMapper.map(entity);
+    }
+
+    public PageOfLessonItemDto getPageOfLessonItemDto(Long lessonId) {
+        var result = lessonService.getPageOfLessonItem(lessonId, PageableUtil.MAX_SIZE_PAGE);
+        return new PageOfLessonItemDto()
+                .size(result.getSize())
+                .number(result.getNumber())
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .content(result.getContent().stream().map(lessonMapper::map).toList());
     }
 
     public NextQuestionDto startLessonFromPlan(Long planId, OrderStrategyTypeDto orderStrategyTypeDto) {

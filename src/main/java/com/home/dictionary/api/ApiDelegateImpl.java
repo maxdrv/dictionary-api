@@ -162,6 +162,11 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     }
 
     @Override
+    public ResponseEntity<PageOfLessonItemDto> getLessonItemsByLessonId(Long lessonId) {
+        return ResponseEntity.ok(lessonFacade.getPageOfLessonItemDto(lessonId));
+    }
+
+    @Override
     public ResponseEntity<NextQuestionDto> getNextQuestionByLessonId(Long lessonId) {
         return ResponseEntity.ok(lessonFacade.getNextQuestionByLessonId(lessonId));
     }

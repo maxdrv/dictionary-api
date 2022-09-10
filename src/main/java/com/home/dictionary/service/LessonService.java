@@ -4,6 +4,8 @@ import com.home.dictionary.exception.ApiEntityNotFoundException;
 import com.home.dictionary.model.lesson.Lesson;
 import com.home.dictionary.model.lesson.LessonItem;
 import com.home.dictionary.model.phrase.Phrase;
+import com.home.dictionary.repository.LessonItemHistoryRepository;
+import com.home.dictionary.repository.LessonItemRepository;
 import com.home.dictionary.repository.LessonRepository;
 import com.home.dictionary.service.order.OrderStrategies;
 import com.home.dictionary.service.order.OrderStrategyType;
@@ -28,6 +30,7 @@ public class LessonService {
 
     private final PlanService planService;
     private final LessonRepository lessonRepository;
+    private final LessonItemRepository lessonItemRepository;
     private final EntityManager entityManager;
     private final Clock clock;
     private final OrderStrategies orderStrategies;
@@ -43,6 +46,10 @@ public class LessonService {
     public Lesson getLessonByIdOrThrow(Long lessonId) {
         return getLessonById(lessonId)
                 .orElseThrow(() -> new ApiEntityNotFoundException("Lesson with id " + lessonId + " not found"));
+    }
+
+    public Page<LessonItem> getPageOfLessonItem(Long lessonId, Pageable pageable) {
+        return lessonItemRepository.findAllByLessonId(lessonId, pageable);
     }
 
     public Lesson createLessonFromPlan(Long planId, OrderStrategyType orderStrategyType) {
