@@ -8,6 +8,7 @@ import com.home.dictionary.model.phrase.PhraseSpecification;
 import com.home.dictionary.openapi.model.CreatePhraseRequest;
 import com.home.dictionary.openapi.model.UpdatePhraseRequest;
 import com.home.dictionary.repository.PhraseRepository;
+import com.home.dictionary.repository.PlanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import java.util.Optional;
 public class PhraseService {
 
     private final PhraseRepository phraseRepository;
+    private final PlanRepository planRepository;
     private final LangMapper langMapper;
     private final EntityManager entityManager;
 
@@ -41,8 +43,12 @@ public class PhraseService {
     }
 
     public Phrase create(CreatePhraseRequest request) {
+        var plan = Optional.ofNullable(request.getPlanId())
+                .map(planRepository::findByIdOrThrow)
+                .orElse(null);
+
         var toSave = new Phrase();
-        toSave.setPlan(null);
+        toSave.setPlan(plan);
         toSave.setSource(request.getSource());
         toSave.setSourceLang(langMapper.map(request.getSourceLang()));
         toSave.setTranscription(request.getTranscription());
@@ -63,6 +69,12 @@ public class PhraseService {
     }
 
     public void deleteById(Long phraseId) {
+        getPhraseById(phraseId)
+                .ifPresent(phrase -> {
+                    phrase.setPlan(null);
+                    phraseRepository.save(phrase);
+                });
+
         phraseRepository.deleteById(phraseId);
     }
 

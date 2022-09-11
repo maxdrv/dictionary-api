@@ -937,6 +937,9 @@ components:
           type: string
         targetLang:
           $ref: "#/components/schemas/LangDto"
+        planId:
+          type: integer
+          format: int64
     UpdatePhraseRequest:
       type: object
       required:
