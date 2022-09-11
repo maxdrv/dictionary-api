@@ -4,7 +4,7 @@ import com.home.dictionary.exception.ApiEntityNotFoundException;
 import com.home.dictionary.model.lesson.Lesson;
 import com.home.dictionary.model.lesson.LessonItem;
 import com.home.dictionary.model.phrase.Phrase;
-import com.home.dictionary.repository.LessonItemHistoryRepository;
+import com.home.dictionary.model.user.ApiUser;
 import com.home.dictionary.repository.LessonItemRepository;
 import com.home.dictionary.repository.LessonRepository;
 import com.home.dictionary.service.order.OrderStrategies;
@@ -31,6 +31,7 @@ public class LessonService {
     private final PlanService planService;
     private final LessonRepository lessonRepository;
     private final LessonItemRepository lessonItemRepository;
+    private final ApiUserService apiUserService;
     private final EntityManager entityManager;
     private final Clock clock;
     private final OrderStrategies orderStrategies;
@@ -80,6 +81,20 @@ public class LessonService {
         entityManager.flush();
 
         return getLessonByIdOrThrow(savedLesson.getId());
+    }
+
+    public Optional<Lesson> getCurrentLesson() {
+        return Optional.of(apiUserService.getCurrentUser())
+                .map(ApiUser::getCurrentLessonId)
+                .flatMap(this::getLessonById);
+    }
+
+    public Lesson activateLessonById(Long lessonId) {
+        var user = apiUserService.getCurrentUser();
+        var lesson = getLessonByIdOrThrow(lessonId);
+        user.setCurrentLessonId(lesson.getId());
+        entityManager.flush();
+        return lesson;
     }
 
 }

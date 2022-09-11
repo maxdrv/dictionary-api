@@ -18,7 +18,7 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface LessonMapper {
 
-    LessonDto map(Lesson lesson);
+    LessonDto map(Lesson lesson, boolean active);
 
     LessonItemDto map(LessonItem lessonItem);
 

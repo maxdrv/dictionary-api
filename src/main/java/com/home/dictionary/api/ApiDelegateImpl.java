@@ -1,9 +1,6 @@
 package com.home.dictionary.api;
 
-import com.home.dictionary.facade.LessonFacade;
-import com.home.dictionary.facade.PhraseFacade;
-import com.home.dictionary.facade.PlanFacade;
-import com.home.dictionary.facade.TagFacade;
+import com.home.dictionary.facade.*;
 import com.home.dictionary.model.phrase.PhraseFilter;
 import com.home.dictionary.openapi.api.ApiApiDelegate;
 import com.home.dictionary.openapi.model.*;
@@ -25,6 +22,7 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     private final PlanFacade planFacade;
     private final TagFacade tagFacade;
     private final PhraseFacade phraseFacade;
+    private final ApiUserFacade apiUserFacade;
 
     @Override
     public ResponseEntity<PageOfPhraseDto> getPhrases(Long planId, Integer page, Integer size, String sort) {
@@ -174,6 +172,28 @@ public class ApiDelegateImpl implements ApiApiDelegate {
     @Override
     public ResponseEntity<NextQuestionDto> answerTheQuestion(Long lessonId, Long lessonItemId, AnswerDto answerDto) {
         return ResponseEntity.ok(lessonFacade.answerTheQuestion(lessonId, lessonItemId, answerDto));
+    }
+
+    @Override
+    public ResponseEntity<CurrentLessonResponse> answerTheQuestionAndGetContext(Long lessonId, Long lessonItemId, AnswerDto answerDto) {
+        lessonFacade.answerTheQuestion(lessonId, lessonItemId, answerDto);
+        return ResponseEntity.ok(lessonFacade.getCurrentLesson());
+    }
+
+    @Override
+    public ResponseEntity<LessonDto> activateLessonById(Long lessonId) {
+        return ResponseEntity.ok(lessonFacade.activateLessonById(lessonId));
+    }
+
+    @Override
+    public ResponseEntity<CurrentLessonResponse> getCurrentLesson() {
+        return ResponseEntity.ok(lessonFacade.getCurrentLesson());
+    }
+
+    @Override
+    public ResponseEntity<PageOfApiUserDto> getPageOfApiUserDto(Integer page, Integer size, String sort) {
+        var pageable = PageableBuilder.of(page, size).sortOrIdAsc(sort).build();
+        return ResponseEntity.ok(apiUserFacade.getPageOfApiUserDto(pageable));
     }
 
 }
