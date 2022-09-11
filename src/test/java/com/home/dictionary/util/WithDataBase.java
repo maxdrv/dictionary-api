@@ -34,7 +34,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 public class WithDataBase {
 
     @Autowired
-    protected DemoApiCaller caller;
+    protected ApiCaller caller;
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
