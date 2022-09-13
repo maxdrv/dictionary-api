@@ -5,11 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.List;
 
 @Getter
 @Setter
@@ -17,12 +15,12 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 
 @Entity
-@Table(name = "api_user")
-public class ApiUser {
+@Table(name = "authority")
+public class Authority {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "api_user_seq")
-    @SequenceGenerator(name = "api_user_seq", sequenceName = "api_user_seq", allocationSize = 10)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "authority_seq")
+    @SequenceGenerator(name = "authority_seq", sequenceName = "authority_seq", allocationSize = 10)
     @EqualsAndHashCode.Include
     private Long id;
 
@@ -33,18 +31,11 @@ public class ApiUser {
     @Version
     private Instant updatedAt;
 
-    private String username;
+    @Enumerated(EnumType.STRING)
+    private AuthorityType type;
 
-    private String password;
-
-    private String email;
-
-    private boolean enabled;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<Authority> authorities;
-
-    @Nullable
-    private Long currentLessonId;
+    @JoinColumn(name = "user_id")
+    @ManyToOne
+    private ApiUser user;
 
 }

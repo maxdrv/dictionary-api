@@ -5,11 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.List;
 
 @Getter
 @Setter
@@ -17,12 +15,12 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 
 @Entity
-@Table(name = "api_user")
-public class ApiUser {
+@Table(name = "refresh_token")
+public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "api_user_seq")
-    @SequenceGenerator(name = "api_user_seq", sequenceName = "api_user_seq", allocationSize = 10)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "refresh_token_seq")
+    @SequenceGenerator(name = "refresh_token_seq", sequenceName = "refresh_token_seq", allocationSize = 10)
     @EqualsAndHashCode.Include
     private Long id;
 
@@ -33,18 +31,8 @@ public class ApiUser {
     @Version
     private Instant updatedAt;
 
-    private String username;
+    private String token;
 
-    private String password;
-
-    private String email;
-
-    private boolean enabled;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<Authority> authorities;
-
-    @Nullable
-    private Long currentLessonId;
+    private Instant created;
 
 }

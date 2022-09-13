@@ -14,5 +14,7 @@
     <include file="lesson/lesson_item.sql" relativeToChangelogFile="true"/>
     <include file="lesson/lesson_item_history.sql" relativeToChangelogFile="true"/>
     <include file="user/user.sql" relativeToChangelogFile="true"/>
+    <include file="user/authority.sql" relativeToChangelogFile="true"/>
+    <include file="user/refresh_token.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
