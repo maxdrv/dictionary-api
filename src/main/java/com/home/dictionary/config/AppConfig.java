@@ -25,7 +25,8 @@ public class AppConfig {
                 registry
                         .addMapping("/api/v1/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedOrigins("http://localhost:3000");
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedHeaders("Origin", "Content-Type", "X-Auth-Token", "Authorization");
 
                 registry
                         .addMapping("/ping")

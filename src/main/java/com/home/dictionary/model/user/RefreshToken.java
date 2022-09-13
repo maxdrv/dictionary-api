@@ -1,16 +1,13 @@
 package com.home.dictionary.model.user;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.Instant;
 
 @Getter
-@Setter
+@Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 
@@ -34,5 +31,10 @@ public class RefreshToken {
     private String token;
 
     private Instant created;
+
+    public RefreshToken(String token, Instant created) {
+        this.token = token;
+        this.created = created;
+    }
 
 }

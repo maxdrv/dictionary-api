@@ -1,9 +1,6 @@
 package com.home.dictionary.model.user;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.lang.Nullable;
 
@@ -12,7 +9,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Getter
-@Setter
+@Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 
@@ -44,7 +41,26 @@ public class ApiUser {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Authority> authorities;
 
+    private Instant created;
+
+    @Setter(AccessLevel.PUBLIC)
     @Nullable
     private Long currentLessonId;
+
+    public ApiUser(
+            String username,
+            String password,
+            String email,
+            boolean enabled,
+            List<Authority> authorities,
+            Instant created
+    ) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.enabled = enabled;
+        this.authorities = authorities;
+        this.created = created;
+    }
 
 }

@@ -1,16 +1,13 @@
 package com.home.dictionary.model.user;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.Instant;
 
 @Getter
-@Setter
+@Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 
@@ -37,5 +34,10 @@ public class Authority {
     @JoinColumn(name = "user_id")
     @ManyToOne
     private ApiUser user;
+
+    public Authority(AuthorityType type, ApiUser user) {
+        this.type = type;
+        this.user = user;
+    }
 
 }
