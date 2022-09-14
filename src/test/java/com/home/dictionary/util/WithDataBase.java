@@ -16,6 +16,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.event.ApplicationEventsTestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
+import org.springframework.test.web.servlet.MockMvc;
 
 
 @AutoConfigureMockMvc
@@ -32,6 +33,9 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 @SpringBootTest
 @ComponentScan("com.home.calories")
 public class WithDataBase {
+
+    @Autowired
+    protected MockMvc mockMvc;
 
     @Autowired
     protected ApiCaller caller;

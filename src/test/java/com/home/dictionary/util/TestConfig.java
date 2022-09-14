@@ -30,11 +30,16 @@ public class TestConfig {
 
     @Bean
     public MockMvc mockMvc(WebApplicationContext webApplicationContext) {
-        return MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilter(((request, response, chain) -> {
-                    response.setCharacterEncoding("UTF-8");
-                    chain.doFilter(request, response);
-                })).build();
+        return MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
+
+//    @Bean
+//    public MockMvc mockMvc(WebApplicationContext webApplicationContext) {
+//        return MockMvcBuilders.webAppContextSetup(webApplicationContext)
+//                .addFilter(((request, response, chain) -> {
+//                    response.setCharacterEncoding("UTF-8");
+//                    chain.doFilter(request, response);
+//                })).build();
+//    }
 
 }

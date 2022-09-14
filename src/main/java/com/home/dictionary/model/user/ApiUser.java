@@ -63,4 +63,11 @@ public class ApiUser {
         this.created = created;
     }
 
+    public void enable() {
+        if (this.enabled) {
+            return;
+        }
+        this.enabled = true;
+    }
+
 }
