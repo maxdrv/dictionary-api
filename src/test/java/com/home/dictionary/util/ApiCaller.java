@@ -2,15 +2,15 @@ package com.home.dictionary.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.home.dictionary.openapi.model.CreatePhraseRequest;
 import com.home.dictionary.openapi.model.LoginRequest;
 import com.home.dictionary.openapi.model.RegisterRequest;
 import lombok.SneakyThrows;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-@Component
 public class ApiCaller {
 
     private final MockMvc mockMvc;
@@ -23,11 +23,33 @@ public class ApiCaller {
     }
 
     @SneakyThrows
-    public SneakyResultActions register(RegisterRequest request) {
+    public SneakyResultActions getPageOfPhrase(String params) {
+        return new SneakyResultActions(
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/phrase" + params)
+                )
+        );
+    }
+
+    @SneakyThrows
+    public SneakyResultActions postPhrase(CreatePhraseRequest request, Header... headers) {
+        return new SneakyResultActions(
+                mockMvc.perform(
+                        MockMvcRequestBuilders.post("/api/v1/phrase")
+                                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                                .headers(toHttpHeaders(headers))
+                                .content(objectMapper.writeValueAsString(request))
+                )
+        );
+    }
+
+    @SneakyThrows
+    public SneakyResultActions register(RegisterRequest request, Header... headers) {
         return new SneakyResultActions(
                 mockMvc.perform(
                         MockMvcRequestBuilders.post("/api/v1/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
+                                .headers(toHttpHeaders(headers))
                                 .content(objectMapper.writeValueAsString(request))
                 )
         );
@@ -42,6 +64,14 @@ public class ApiCaller {
                                 .content(objectMapper.writeValueAsString(request))
                 )
         );
+    }
+
+    private static HttpHeaders toHttpHeaders(Header... headers) {
+        var httpHeaders = new HttpHeaders();
+        for (Header header : headers) {
+            httpHeaders.add(header.name(), header.value());
+        }
+        return httpHeaders;
     }
 
 }

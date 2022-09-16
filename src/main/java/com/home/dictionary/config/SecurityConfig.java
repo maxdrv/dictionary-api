@@ -19,9 +19,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Slf4j
 
-@EnableWebSecurity
+//@EnableWebSecurity(debug = true)
+@EnableWebSecurity()
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
+
+    public static final String AUTH_ROOT_URL = "/api/v1/auth";
+    public static final String AUTH_MATCH_URL = "/api/v1/auth/**";
 
     @Bean
     public UserDetailsService userDetailsService(ApiUserRepository apiUserRepository) {
@@ -53,11 +57,11 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+        http.csrf().disable();
         http.authorizeRequests()
-                .antMatchers("/api/v1/auth/*").permitAll()
+                .antMatchers(AUTH_MATCH_URL).permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
-                .anyRequest()
-                .authenticated();
+                .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

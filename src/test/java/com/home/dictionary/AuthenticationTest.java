@@ -2,14 +2,13 @@ package com.home.dictionary;
 
 import com.home.dictionary.model.user.Authority;
 import com.home.dictionary.model.user.AuthorityType;
-import com.home.dictionary.openapi.model.AuthenticationResponse;
-import com.home.dictionary.openapi.model.LoginRequest;
-import com.home.dictionary.openapi.model.RegisterRequest;
+import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.repository.ApiUserRepository;
 import com.home.dictionary.util.WithDataBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.home.dictionary.util.Header.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -23,13 +22,13 @@ public class AuthenticationTest extends WithDataBase {
     ApiUserRepository apiUserRepository;
 
     @Test
-    public void userRegistrationIsOk() {
+    void userRegistrationIsOk() {
         var registerRequest = new RegisterRequest()
                 .username(USERNAME)
                 .password(PASSWORD)
                 .email(EMAIL);
 
-        caller.register(registerRequest)
+        securedApiCaller.register(registerRequest)
                 .andExpect(status().isOk())
                 .andExpect(content().json("{'message': 'User Registration Successful'}"));
 
@@ -43,11 +42,11 @@ public class AuthenticationTest extends WithDataBase {
     }
 
     @Test
-    public void userLoginIsOk() {
+    void userLoginIsOk() {
         registerUserAndEnable();
 
         var loginRequest = new LoginRequest().username(USERNAME).password(PASSWORD);
-        var response = caller.login(loginRequest)
+        var response = securedApiCaller.login(loginRequest)
                 .andExpect(status().isOk())
                 .andReturnAs(AuthenticationResponse.class);
 
@@ -61,44 +60,130 @@ public class AuthenticationTest extends WithDataBase {
     }
 
     @Test
-    public void userLoginWrongPassword() {
+    void userLoginWrongPassword() {
         registerUserAndEnable();
 
         var loginRequest = new LoginRequest().username(USERNAME).password("wrong_password");
-        caller.login(loginRequest)
+        securedApiCaller.login(loginRequest)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value("bad credentials"));
     }
 
     @Test
-    public void userLoginWrongUsername() {
+    void userLoginWrongUsername() {
         registerUserAndEnable();
         var loginRequest = new LoginRequest().username("wrong_username").password("wrong_password");
-        caller.login(loginRequest)
+        securedApiCaller.login(loginRequest)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value("bad credentials"));
     }
 
     @Test
-    public void requestAuthenticated() {
+    void getRequestDoesNotNeedAuthentication() {
+        securedApiCaller.getPageOfPhrase("?page=0&size=20")
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                        {
+                            "size": 20,
+                            "number": 0,
+                            "totalElements": 0,
+                            "totalPages": 0,
+                            "content": []
+                        }
+                        """));
+    }
+
+    @Test
+    void postRequest403_authHeaderMissing() {
+        registerUserAndEnable();
+
+        var createPhraseRequest = new CreatePhraseRequest()
+                .source("1")
+                .sourceLang(LangDto.FR)
+                .transcription("1")
+                .target("1")
+                .targetLang(LangDto.RU);
+
+        securedApiCaller.postPhrase(createPhraseRequest)
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void postRequest403_authHeaderPresentButEmpty() {
+        registerUserAndEnable();
+
+        var createPhraseRequest = new CreatePhraseRequest()
+                .source("1")
+                .sourceLang(LangDto.FR)
+                .transcription("1")
+                .target("1")
+                .targetLang(LangDto.RU);
+
+        securedApiCaller.postPhrase(createPhraseRequest, auth(""))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void postRequest403_authHeaderPresentButOnlyType() {
+        registerUserAndEnable();
+
+        var createPhraseRequest = new CreatePhraseRequest()
+                .source("1")
+                .sourceLang(LangDto.FR)
+                .transcription("1")
+                .target("1")
+                .targetLang(LangDto.RU);
+
+        securedApiCaller.postPhrase(createPhraseRequest, auth("Bearer "))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void postRequest403_authHeaderPresentButInvalid() {
+        registerUserAndEnable();
+
+        var createPhraseRequest = new CreatePhraseRequest()
+                .source("1")
+                .sourceLang(LangDto.FR)
+                .transcription("1")
+                .target("1")
+                .targetLang(LangDto.RU);
+
+        securedApiCaller.postPhrase(createPhraseRequest, auth("Bearer Adfasdfasdf"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void requestAuthenticated() {
         registerUserAndEnable();
         var loginRequest = new LoginRequest().username(USERNAME).password(PASSWORD);
-        var response = caller.login(loginRequest)
+        var response = securedApiCaller.login(loginRequest)
                 .andExpect(status().isOk())
                 .andReturnAs(AuthenticationResponse.class);
 
         var bearerToken = response.getAuthenticationToken();
 
+        var createPhraseRequest = new CreatePhraseRequest()
+                .source("1")
+                .sourceLang(LangDto.FR)
+                .transcription("1")
+                .target("1")
+                .targetLang(LangDto.RU);
 
+        securedApiCaller.postPhrase(createPhraseRequest, auth("Bearer " + bearerToken))
+                .andExpect(status().isCreated());
+
+        securedApiCaller.postPhrase(createPhraseRequest, auth("Bearer " + bearerToken))
+                .andExpect(status().isCreated());
     }
 
-    public void registerUserAndEnable() {
+    void registerUserAndEnable() {
         var registerRequest = new RegisterRequest()
                 .username(USERNAME)
                 .password(PASSWORD)
                 .email(EMAIL);
 
-        caller.register(registerRequest)
+        securedApiCaller.register(registerRequest)
                 .andExpect(status().isOk());
 
         var user = apiUserRepository.findByUsernameOrThrow(USERNAME);

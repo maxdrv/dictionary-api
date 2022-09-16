@@ -3,6 +3,7 @@ package com.home.dictionary.handler;
 import com.home.dictionary.dto.errors.ErrorDetail;
 import com.home.dictionary.dto.errors.ValidationError;
 import com.home.dictionary.exception.ApiEntityNotFoundException;
+import com.home.dictionary.exception.ApiSecurityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
@@ -90,6 +91,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         errorDetail.setDetail(badCredentialsException.getMessage());
         errorDetail.setDeveloperMessage(badCredentialsException.getClass().getName());
         return new ResponseEntity<>(errorDetail, null, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ApiSecurityException.class)
+    public ResponseEntity<ErrorDetail> securityException(ApiSecurityException securityException, HttpServletRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTimestamp(clock.millis());
+        errorDetail.setStatus(HttpStatus.FORBIDDEN.value());
+        errorDetail.setTitle("forbidden");
+        errorDetail.setDetail(securityException.getMessage());
+        errorDetail.setDeveloperMessage(securityException.getClass().getName());
+        return new ResponseEntity<>(errorDetail, null, HttpStatus.FORBIDDEN);
     }
 
 }

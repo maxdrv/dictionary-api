@@ -6,6 +6,7 @@ import com.github.springtestdbunit.dataset.ReplacementDataSetLoader;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
@@ -37,8 +38,13 @@ public class WithDataBase {
     @Autowired
     protected MockMvc mockMvc;
 
+    @Qualifier("apiCaller")
     @Autowired
     protected ApiCaller caller;
+
+    @Qualifier("securedApiCaller")
+    @Autowired
+    protected ApiCaller securedApiCaller;
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;

@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+
 @Configuration
 public class TestConfig {
 
@@ -28,9 +30,27 @@ public class TestConfig {
         return provider.createDataSourceFromConnectionInfo(connectionInfo);
     }
 
-    @Bean
+    @Bean(name = "mockMvc")
     public MockMvc mockMvc(WebApplicationContext webApplicationContext) {
         return MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Bean(name = "apiCaller")
+    public ApiCaller apiCaller(MockMvc mockMvc) {
+        return new ApiCaller(mockMvc);
+    }
+
+    @Bean(name = "securedMockMvc")
+    public MockMvc securedMockMvc(WebApplicationContext webApplicationContext) {
+        return MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
+    }
+
+    @Bean(name = "securedApiCaller")
+    public ApiCaller securedApiCaller(MockMvc securedMockMvc) {
+        return new ApiCaller(securedMockMvc);
     }
 
 //    @Bean

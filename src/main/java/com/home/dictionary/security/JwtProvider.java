@@ -4,6 +4,7 @@ import com.home.dictionary.exception.ThisShouldNeverHappen;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -91,7 +92,7 @@ public class JwtProvider {
         try {
             Jwts.parser().setSigningKey(getPublicKey()).parseClaimsJws(jwt);
             return true;
-        } catch (ExpiredJwtException ex) {
+        } catch (ExpiredJwtException | MalformedJwtException ex) {
             return false;
         }
     }
