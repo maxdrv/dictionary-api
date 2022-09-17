@@ -4,6 +4,7 @@ import com.home.dictionary.dto.errors.ErrorDetail;
 import com.home.dictionary.dto.errors.ValidationError;
 import com.home.dictionary.exception.ApiEntityNotFoundException;
 import com.home.dictionary.exception.ApiSecurityException;
+import com.home.dictionary.exception.NotAllowedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
@@ -104,4 +105,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetail, null, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(NotAllowedException.class)
+    public ResponseEntity<ErrorDetail> notAllowed(NotAllowedException notAllowedException, HttpServletRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTimestamp(clock.millis());
+        errorDetail.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorDetail.setTitle("Not like this Nunu! Not like this...");
+        errorDetail.setDetail(notAllowedException.getMessage());
+        errorDetail.setDeveloperMessage(notAllowedException.getClass().getName());
+        return new ResponseEntity<>(errorDetail, null, HttpStatus.BAD_REQUEST);
+    }
 }

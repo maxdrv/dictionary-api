@@ -1,5 +1,6 @@
 package com.home.dictionary.service;
 
+import com.home.dictionary.exception.NotAllowedException;
 import com.home.dictionary.mapper.DateTimeMapper;
 import com.home.dictionary.model.user.ApiUser;
 import com.home.dictionary.model.user.Authority;
@@ -31,6 +32,7 @@ import java.util.Collections;
 @Transactional
 public class AuthService {
 
+    private final ConfigurationService configurationService;
     private final ApiUserRepository apiUserRepository;
     private final AuthorityRepository authorityRepository;
     private final AuthenticationManager authenticationManager;
@@ -42,6 +44,10 @@ public class AuthService {
 
     @Transactional
     public void register(RegisterRequest request) {
+        if (configurationService.registrationNotAllowed()) {
+            throw new NotAllowedException("Sorry! But we temporarily do not accept registration requests (((");
+        }
+
         ApiUser apiUser = new ApiUser(
                 request.getUsername(),
                 passwordEncoder.encode(request.getPassword()),

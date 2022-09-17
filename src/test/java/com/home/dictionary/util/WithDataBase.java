@@ -3,6 +3,7 @@ package com.home.dictionary.util;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 import com.github.springtestdbunit.dataset.ReplacementDataSetLoader;
+import com.home.dictionary.repository.ApiPropertyRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class WithDataBase {
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    protected ApiPropertyRepository apiPropertyRepository;
 
     /**
      * for debug on embedded postgres

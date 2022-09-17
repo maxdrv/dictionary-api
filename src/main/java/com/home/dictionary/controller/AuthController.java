@@ -3,7 +3,6 @@ package com.home.dictionary.controller;
 import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.service.AuthService;
 import com.home.dictionary.service.RefreshTokenService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

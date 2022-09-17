@@ -1,13 +1,16 @@
 package com.home.dictionary;
 
+import com.home.dictionary.model.configuration.ApiProperty;
 import com.home.dictionary.model.user.Authority;
 import com.home.dictionary.model.user.AuthorityType;
 import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.repository.ApiUserRepository;
 import com.home.dictionary.util.WithDataBase;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.home.dictionary.model.configuration.ApiPropertyKey.REGISTRATION_ALLOWED;
 import static com.home.dictionary.util.Header.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -20,6 +23,11 @@ public class AuthenticationTest extends WithDataBase {
 
     @Autowired
     ApiUserRepository apiUserRepository;
+
+    @BeforeEach
+    void init() {
+        apiPropertyRepository.save(new ApiProperty(REGISTRATION_ALLOWED.name(), "true"));
+    }
 
     @Test
     void userRegistrationIsOk() {
