@@ -1,6 +1,7 @@
 package com.home.dictionary.service;
 
 import com.home.dictionary.exception.NotAllowedException;
+import com.home.dictionary.mapper.ApiUserMapper;
 import com.home.dictionary.mapper.DateTimeMapper;
 import com.home.dictionary.model.user.ApiUser;
 import com.home.dictionary.model.user.Authority;
@@ -41,6 +42,7 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final Clock clock;
     private final DateTimeMapper dateTimeMapper;
+    private final ApiUserMapper apiUserMapper;
 
     @Transactional
     public void register(RegisterRequest request) {
@@ -92,11 +94,13 @@ public class AuthService {
             String username
     ) {
         var expiresAt = clock.instant().plusMillis(jwtProvider.getJwtExpirationInMillis());
+        var user = apiUserRepository.findByUsernameOrThrow(username);
         return new AuthenticationResponse()
                 .authenticationToken(token)
                 .refreshToken(refreshToken)
                 .expiresAt(dateTimeMapper.mapToOffsetAtMoscow(expiresAt))
-                .username(username);
+                .username(username)
+                .roles(apiUserMapper.mapToRoleDtoList(user.getAuthorities()));
     }
 
 }
