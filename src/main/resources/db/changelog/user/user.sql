@@ -21,4 +21,4 @@ create sequence if not exists api_user_seq start 10000 increment 10;
 
 --changeset maxdrv:insert_stab_user
 insert into api_user (id, created_at, updated_at, username, password, email, enabled, created, current_lesson_id)
-    values (1, now(), now(), 'username', 'password', 'email', true, now(), null);
+    values (1, now(), now(), 'username1', '$2a$10$uGI2WeMiwkFoITb2le7fKeFPlrizqtVs13I3pSU8UcvdbWiKIRJ7.', 'demo1@gmail.com', true, now(), null);
