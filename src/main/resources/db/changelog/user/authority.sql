@@ -15,5 +15,7 @@ create sequence if not exists authority_seq start 10000 increment 10;
 --changeset maxdrv:insert_authority_for_stub_users
 insert into authority (id, created_at, updated_at, type, user_id) values
         (1, now(), now(), 'USER', 1),
-        (2, now(), now(), 'EDITOR', 2),
-        (3, now(), now(), 'ADMIN', 3);
+        (2, now(), now(), 'USER', 2),
+        (3, now(), now(), 'EDITOR', 2),
+        (4, now(), now(), 'USER', 3),
+        (5, now(), now(), 'ADMIN', 3);
