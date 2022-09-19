@@ -1269,6 +1269,8 @@ components:
         - id
         - createdAt
         - updatedAt
+        - username
+        - roles
       properties:
         id:
           type: integer
