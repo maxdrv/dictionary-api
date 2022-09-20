@@ -1,5 +1,6 @@
 package com.home.dictionary.config;
 
+import com.home.dictionary.model.user.AuthorityType;
 import com.home.dictionary.repository.ApiUserRepository;
 import com.home.dictionary.security.JwtAuthenticationFilter;
 import com.home.dictionary.service.UserDetailsServiceImpl;
@@ -60,6 +61,7 @@ public class SecurityConfig {
         http.csrf().disable();
         http.authorizeRequests()
                 .antMatchers(AUTH_MATCH_URL).permitAll()
+                .antMatchers("/api/v1/admin/**").hasRole(AuthorityType.ADMIN.name())
                 .antMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
                 .anyRequest().authenticated();
 

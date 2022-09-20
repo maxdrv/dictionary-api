@@ -758,7 +758,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CurrentLessonResponse"
-  /api/v1/user:
+  /api/v1/admin/user:
     get:
       summary: get page of api users
       operationId: getPageOfApiUserDto
