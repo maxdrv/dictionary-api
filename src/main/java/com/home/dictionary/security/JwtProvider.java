@@ -7,8 +7,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -56,22 +54,28 @@ public class JwtProvider {
         }
     }
 
-    public String generateAccessToken(Authentication authentication) {
-        User principal = (User) authentication.getPrincipal();
-        return Jwts.builder()
-                .setSubject(principal.getUsername())
-                .setIssuedAt(from(clock.instant()))
-                .signWith(getPrivateKey())
-                .setExpiration(Date.from(clock.instant().plusMillis(accessTokenExpirationInMillis)))
-                .compact();
+    public String generateAccessToken(String username) {
+        return generateToken(
+                username,
+                getPrivateKey(),
+                accessTokenExpirationInMillis
+        );
     }
 
-    public String generateTokenWithUsername(String username) {
+    public String generateRefreshToken(String username) {
+        return generateToken(
+                username,
+                getPrivateKey(),  // TODO: separate key for refresh token???
+                refreshTokenExpirationInMillis
+        );
+    }
+
+    private String generateToken(String username, PrivateKey privateKey, Long expirationInMillis) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(from(clock.instant()))
-                .signWith(getPrivateKey())
-                .setExpiration(Date.from(clock.instant().plusMillis(refreshTokenExpirationInMillis)))
+                .signWith(privateKey)
+                .setExpiration(Date.from(clock.instant().plusMillis(expirationInMillis)))
                 .compact();
     }
 
@@ -106,14 +110,6 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
-    }
-
-    public Long getAccessTokenExpirationInMillis() {
-        return accessTokenExpirationInMillis;
-    }
-
-    public Long getRefreshTokenExpirationInMillis() {
-        return refreshTokenExpirationInMillis;
     }
 
 }

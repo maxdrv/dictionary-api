@@ -62,6 +62,7 @@ public class SecurityConfig {
         http.authorizeRequests()
                 .antMatchers(AUTH_MATCH_URL).permitAll()
                 .antMatchers("/api/v1/admin/**").hasRole(AuthorityType.ADMIN.name())
+                .antMatchers(HttpMethod.GET, "/ping").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
                 .anyRequest().authenticated();
 

@@ -1348,7 +1348,6 @@ components:
         - username
         - roles
         - accessToken
-        - expiresAt
       properties:
         username:
           type: string
@@ -1358,9 +1357,6 @@ components:
             $ref: "#/components/schemas/UserRoleDto"
         accessToken:
           type: string
-        expiresAt:
-          type: string
-          format: date-time
     RefreshTokenRequest:
       type: object
       required:

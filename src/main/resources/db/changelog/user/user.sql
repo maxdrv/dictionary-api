@@ -11,7 +11,8 @@ create table if not exists api_user
     email             text        not null,
     enabled           boolean     default false,
     created           timestamptz not null,
-    current_lesson_id bigint
+    current_lesson_id bigint,
+    refresh_token     text
 );
 
 comment on column api_user.created_at is 'tech column';

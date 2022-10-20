@@ -1,5 +1,6 @@
 package com.home.dictionary.controller;
 
+import com.home.dictionary.exception.ApiSecurityException;
 import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.service.AuthService;
 import com.home.dictionary.service.RefreshTokenService;
@@ -9,9 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -55,20 +54,19 @@ public class AuthController {
                                 .username(loginResponse.username())
                                 .roles(loginResponse.roles())
                                 .accessToken(loginResponse.accessToken())
-                                .expiresAt(loginResponse.accessExpiresAt())
                 );
     }
 
-    // TODO поменять на получение refresh токена из Cookie
-    // TODO ручку можно будет переделать в GET
-    @PostMapping("/api/v1/auth/refresh/token")
-    public AuthenticationResponse refreshToken(@Validated @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        var refreshResponse = authService.refreshToken(refreshTokenRequest);
+    @GetMapping("/api/v1/auth/refresh")
+    public AuthenticationResponse refreshToken(@CookieValue(name = "jwt") String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new ApiSecurityException("refresh token not provided");
+        }
+        var refreshResponse = authService.refreshToken(refreshToken);
         return new AuthenticationResponse()
                 .username(refreshResponse.username())
                 .roles(refreshResponse.roles())
-                .accessToken(refreshResponse.accessToken())
-                .expiresAt(refreshResponse.accessExpiresAt());
+                .accessToken(refreshResponse.accessToken());
     }
 
     @PostMapping("/api/v1/auth/logout")

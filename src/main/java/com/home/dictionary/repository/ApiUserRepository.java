@@ -16,4 +16,6 @@ public interface ApiUserRepository extends PagingAndSortingRepository<ApiUser, L
                 .orElseThrow(() -> new UsernameNotFoundException("No user found with name " + username));
     }
 
+    Optional<ApiUser> findByRefreshToken(String refreshToken);
+
 }

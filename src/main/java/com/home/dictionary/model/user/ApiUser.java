@@ -47,6 +47,9 @@ public class ApiUser {
     @Nullable
     private Long currentLessonId;
 
+    @Nullable
+    private String refreshToken;
+
     public ApiUser(
             String username,
             String password,
@@ -68,6 +71,10 @@ public class ApiUser {
             return;
         }
         this.enabled = true;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
 }
