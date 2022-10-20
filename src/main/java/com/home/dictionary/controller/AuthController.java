@@ -59,6 +59,8 @@ public class AuthController {
                 );
     }
 
+    // TODO поменять на получение refresh токена из Cookie
+    // TODO ручку можно будет переделать в GET
     @PostMapping("/api/v1/auth/refresh/token")
     public AuthenticationResponse refreshToken(@Validated @RequestBody RefreshTokenRequest refreshTokenRequest) {
         var refreshResponse = authService.refreshToken(refreshTokenRequest);
