@@ -1347,8 +1347,7 @@ components:
       required:
         - username
         - roles
-        - authenticationToken
-        - refreshToken
+        - accessToken
         - expiresAt
       properties:
         username:
@@ -1357,9 +1356,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/UserRoleDto"
-        authenticationToken:
-          type: string
-        refreshToken:
+        accessToken:
           type: string
         expiresAt:
           type: string

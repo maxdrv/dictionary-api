@@ -6,13 +6,14 @@ import com.home.dictionary.mapper.DateTimeMapper;
 import com.home.dictionary.model.user.ApiUser;
 import com.home.dictionary.model.user.Authority;
 import com.home.dictionary.model.user.AuthorityType;
-import com.home.dictionary.openapi.model.AuthenticationResponse;
 import com.home.dictionary.openapi.model.LoginRequest;
 import com.home.dictionary.openapi.model.RefreshTokenRequest;
 import com.home.dictionary.openapi.model.RegisterRequest;
 import com.home.dictionary.repository.ApiUserRepository;
 import com.home.dictionary.repository.AuthorityRepository;
 import com.home.dictionary.security.JwtProvider;
+import com.home.dictionary.service.auth.LoginResponse;
+import com.home.dictionary.service.auth.RefreshResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.util.Collections;
 
 @RequiredArgsConstructor
@@ -74,33 +76,41 @@ public class AuthService {
         }
     }
 
-    public AuthenticationResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         Authentication userPassword = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
         Authentication authentication = authenticationManager.authenticate(userPassword);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtProvider.generateToken(authentication);
-        return authenticationResponse(token, refreshTokenService.generateRefreshToken().getToken(), request.getUsername());
+
+        var user = apiUserRepository.findByUsernameOrThrow(request.getUsername());
+
+        String accessToken = jwtProvider.generateAccessToken(authentication);
+        Instant accessTokenExpiresAt = clock.instant().plusMillis(jwtProvider.getAccessTokenExpirationInMillis());
+
+        String refreshToken = refreshTokenService.generateRefreshToken().getToken();
+        Instant refreshTokenExpiresAt = clock.instant().plusMillis(jwtProvider.getRefreshTokenExpirationInMillis());
+
+        return new LoginResponse(
+                user.getUsername(),
+                apiUserMapper.mapToRoleDtoList(user.getAuthorities()),
+                accessToken,
+                dateTimeMapper.mapToOffsetAtMoscow(accessTokenExpiresAt),
+                refreshToken,
+                dateTimeMapper.mapToOffsetAtMoscow(refreshTokenExpiresAt)
+        );
     }
 
-    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+    public RefreshResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
         refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
-        String token = jwtProvider.generateTokenWithUsername(refreshTokenRequest.getUsername());
-        return authenticationResponse(token, refreshTokenRequest.getRefreshToken(), refreshTokenRequest.getUsername());
-    }
+        String accessToken = jwtProvider.generateTokenWithUsername(refreshTokenRequest.getUsername());
+        var accessTokenExpiresAt = clock.instant().plusMillis(jwtProvider.getAccessTokenExpirationInMillis());
+        var user = apiUserRepository.findByUsernameOrThrow(refreshTokenRequest.getUsername());
 
-    private AuthenticationResponse authenticationResponse(
-            String token,
-            String refreshToken,
-            String username
-    ) {
-        var expiresAt = clock.instant().plusMillis(jwtProvider.getJwtExpirationInMillis());
-        var user = apiUserRepository.findByUsernameOrThrow(username);
-        return new AuthenticationResponse()
-                .authenticationToken(token)
-                .refreshToken(refreshToken)
-                .expiresAt(dateTimeMapper.mapToOffsetAtMoscow(expiresAt))
-                .username(username)
-                .roles(apiUserMapper.mapToRoleDtoList(user.getAuthorities()));
+        return new RefreshResponse(
+                user.getUsername(),
+                apiUserMapper.mapToRoleDtoList(user.getAuthorities()),
+                accessToken,
+                dateTimeMapper.mapToOffsetAtMoscow(accessTokenExpiresAt)
+        );
     }
 
 }

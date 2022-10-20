@@ -3,6 +3,7 @@ package com.home.dictionary.config;
 
 import com.home.dictionary.logging.LoggableDispatcherServlet;
 import com.home.dictionary.util.DateTimeUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,9 @@ import java.time.Clock;
 @Configuration
 public class AppConfig {
 
+    @Autowired
+    private CorsConfigurationProperties corsConfigurationProperties;
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -25,13 +29,15 @@ public class AppConfig {
                 registry
                         .addMapping("/api/v1/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedOrigins("http://localhost:3000")
-                        .allowedHeaders("Origin", "Content-Type", "X-Auth-Token", "Authorization");
+                        .allowedOrigins(corsConfigurationProperties.getAllowedOrigins())
+                        .allowedHeaders("Origin", "Content-Type", "X-Auth-Token", "Authorization")
+                        .allowCredentials(true)
+                        ;
 
                 registry
                         .addMapping("/ping")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedOrigins("http://localhost:3000");
+                        .allowedMethods("GET")
+                        .allowedOrigins(corsConfigurationProperties.getAllowedOrigins());
             }
         };
     }

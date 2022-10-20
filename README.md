@@ -15,3 +15,8 @@ because annotation processing out of order
   Preferences -> Build, Execution, Deployment -> Compiler -> Annotation Processors
   fix paths to annotation processors the way lombok is before mapstruct 
   example: `/Users/derevnin-ma/.m2/repository/org/projectlombok/lombok/1.18.22/lombok-1.18.22.jar:/Users/derevnin-ma/.m2/repository/org/mapstruct/mapstruct/1.5.2.Final/mapstruct-1.5.2.Final.jar`
+
+#Development
+fetch('http://localhost:8081')
+.then(res => res.json())
+.then(console.log)

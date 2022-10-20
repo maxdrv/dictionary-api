@@ -30,8 +30,11 @@ public class JwtProvider {
 
     private KeyStore keyStore;
 
-    @Value("${jwt.expiration.time}")
-    private Long jwtExpirationInMillis;
+    @Value("${jwt.expiration.time.access}")
+    private Long accessTokenExpirationInMillis;
+
+    @Value("${jwt.expiration.time.access}")
+    private Long refreshTokenExpirationInMillis;
 
     @Value("${jwt.keystore.password}")
     private String jwtKeyStorePassword;
@@ -53,13 +56,13 @@ public class JwtProvider {
         }
     }
 
-    public String generateToken(Authentication authentication) {
+    public String generateAccessToken(Authentication authentication) {
         User principal = (User) authentication.getPrincipal();
         return Jwts.builder()
                 .setSubject(principal.getUsername())
                 .setIssuedAt(from(clock.instant()))
                 .signWith(getPrivateKey())
-                .setExpiration(Date.from(clock.instant().plusMillis(jwtExpirationInMillis)))
+                .setExpiration(Date.from(clock.instant().plusMillis(accessTokenExpirationInMillis)))
                 .compact();
     }
 
@@ -68,7 +71,7 @@ public class JwtProvider {
                 .setSubject(username)
                 .setIssuedAt(from(clock.instant()))
                 .signWith(getPrivateKey())
-                .setExpiration(Date.from(clock.instant().plusMillis(jwtExpirationInMillis)))
+                .setExpiration(Date.from(clock.instant().plusMillis(refreshTokenExpirationInMillis)))
                 .compact();
     }
 
@@ -105,8 +108,12 @@ public class JwtProvider {
         return claims.getSubject();
     }
 
-    public Long getJwtExpirationInMillis() {
-        return jwtExpirationInMillis;
+    public Long getAccessTokenExpirationInMillis() {
+        return accessTokenExpirationInMillis;
+    }
+
+    public Long getRefreshTokenExpirationInMillis() {
+        return refreshTokenExpirationInMillis;
     }
 
 }
