@@ -9,10 +9,17 @@ import com.home.dictionary.service.AuthService;
 import com.home.dictionary.util.http.CookieBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import one.util.streamex.StreamEx;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.HttpCookie;
+import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -60,10 +67,24 @@ public class AuthController {
     }
 
     @GetMapping("/api/v1/auth/refresh")
-    public ResponseEntity<AuthenticationResponse> refreshToken(@CookieValue(name = "jwt") String refreshToken) {
-        if (refreshToken == null || refreshToken.isBlank()) {
+    public ResponseEntity<AuthenticationResponse> refreshToken(
+            RequestEntity<Void> request
+    ) {
+        var cookiesHeaders = Optional.ofNullable(request)
+                .map(HttpEntity::getHeaders)
+                .map(headers -> headers.get("Cookie"))
+                .orElse(List.of());
+
+        var jwtCookie = StreamEx.of(cookiesHeaders)
+                .flatMap(header -> HttpCookie.parse(header).stream())
+                .filter(cookie -> "jwt".equals(cookie.getName()))
+                .findFirst()
+                .orElse(null);
+
+        if (jwtCookie == null || jwtCookie.getValue() == null || jwtCookie.getValue().isBlank()) {
             throw new ApiSecurityException("refresh token not provided");
         }
+        var refreshToken = jwtCookie.getValue();
         var refreshResponse = authService.refreshToken(refreshToken);
         return ResponseEntity
                 .status(OK)

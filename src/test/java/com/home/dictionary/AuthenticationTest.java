@@ -5,6 +5,7 @@ import com.home.dictionary.model.user.Authority;
 import com.home.dictionary.model.user.AuthorityType;
 import com.home.dictionary.openapi.model.*;
 import com.home.dictionary.repository.ApiUserRepository;
+import com.home.dictionary.util.Header;
 import com.home.dictionary.util.WithDataBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -192,6 +193,37 @@ public class AuthenticationTest extends WithDataBase {
                 .andExpect(status().isCreated());
     }
 
+    @Test
+    void usingRefreshTokenToGetNewAccessToken() {
+        registerUserAndEnable();
+
+        var loginRequest = new LoginRequest().username(USERNAME).password(PASSWORD);
+        var resultAction = securedApiCaller.login(loginRequest)
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists("jwt"));
+
+        var jwtCookie = resultAction.andReturn().getResponse().getCookie("jwt");
+        var response = resultAction.andReturnAs(AuthenticationResponse.class);
+
+        assertThat(response.getAccessToken()).isNotBlank();
+        assertThat(jwtCookie.getValue()).isNotBlank();
+
+
+        var refreshResponse = securedApiCaller.refresh(Header.cookie("jwt", jwtCookie.getValue()))
+                .andExpect(status().isOk())
+                .andExpect(cookie().doesNotExist("jwt"))
+                .andReturnAs(AuthenticationResponse.class);
+
+        assertThat(refreshResponse.getUsername()).isEqualTo(USERNAME);
+        assertThat(refreshResponse.getAccessToken()).isNotBlank();
+
+        var savedUser = apiUserRepository.findByUsernameOrThrow(USERNAME);
+        assertThat(savedUser.getRefreshToken()).isNotBlank();
+        assertThat(savedUser.getRefreshToken()).isEqualTo(jwtCookie.getValue());
+    }
+
+
+
     void registerUserAndEnable() {
         var registerRequest = new RegisterRequest()
                 .username(USERNAME)
@@ -199,7 +231,7 @@ public class AuthenticationTest extends WithDataBase {
                 .email(EMAIL);
 
         securedApiCaller.register(registerRequest)
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         var user = apiUserRepository.findByUsernameOrThrow(USERNAME);
         user.enable();

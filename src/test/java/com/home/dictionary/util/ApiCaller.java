@@ -66,6 +66,16 @@ public class ApiCaller {
         );
     }
 
+    @SneakyThrows
+    public SneakyResultActions refresh(Header... headers) {
+        return new SneakyResultActions(
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/auth/refresh")
+                                .headers(toHttpHeaders(headers))
+                )
+        );
+    }
+
     private static HttpHeaders toHttpHeaders(Header... headers) {
         var httpHeaders = new HttpHeaders();
         for (Header header : headers) {

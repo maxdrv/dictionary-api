@@ -6,4 +6,8 @@ public record Header(String name, String value) {
         return new Header("Authorization", value);
     }
 
+    public static Header cookie(String name, String value) {
+        return new Header("Cookie", name + "=" + value);
+    }
+
 }
