@@ -109,4 +109,10 @@ public class AuthService {
         );
     }
 
+    @Transactional
+    public void logout(String refreshToken) {
+        apiUserRepository.findByRefreshToken(refreshToken)
+                .ifPresent(user -> user.setRefreshToken(null));
+    }
+
 }

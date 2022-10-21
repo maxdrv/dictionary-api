@@ -73,7 +73,7 @@ public class ApiUser {
         this.enabled = true;
     }
 
-    public void setRefreshToken(String refreshToken) {
+    public void setRefreshToken(@Nullable String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
