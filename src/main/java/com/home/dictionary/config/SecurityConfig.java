@@ -63,7 +63,9 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.GET, "/ping").anonymous()
                 .antMatchers(HttpMethod.OPTIONS, "/ping").anonymous()
                 .antMatchers("/api/v1/auth/**").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/api/v1/admin/**").anonymous()
                 .antMatchers("/api/v1/admin/**").hasAuthority(AuthorityType.ADMIN.name())
+                .antMatchers( HttpMethod.OPTIONS, "/api/v1/**").anonymous()
                 .antMatchers( "/api/v1/**").hasAuthority(AuthorityType.USER.name())
                 .anyRequest().authenticated();
 
