@@ -3,6 +3,7 @@ package com.home.dictionary.config;
 import com.home.dictionary.model.user.AuthorityType;
 import com.home.dictionary.repository.ApiUserRepository;
 import com.home.dictionary.security.JwtAuthenticationFilter;
+import com.home.dictionary.security.WebSecurityCorsFilter;
 import com.home.dictionary.service.UserDetailsServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Slf4j
@@ -71,6 +73,9 @@ public class SecurityConfig {
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // because spring does not provide cors headers on error response! WTF???
+        http.addFilterBefore(new WebSecurityCorsFilter(), ChannelProcessingFilter.class);
 
         // spring создает сессии для авторизованных пользователей, добавляя HttpOnly=true Secured=false cookie
         // затем такие пользователи с такой кукой будут проходить без авторизации
