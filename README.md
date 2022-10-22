@@ -17,6 +17,30 @@ because annotation processing out of order
   example: `/Users/derevnin-ma/.m2/repository/org/projectlombok/lombok/1.18.22/lombok-1.18.22.jar:/Users/derevnin-ma/.m2/repository/org/mapstruct/mapstruct/1.5.2.Final/mapstruct-1.5.2.Final.jar`
 
 #Development
-fetch('http://localhost:8081')
+fetch('http://localhost:8081/ping')
+.then(res => res.json())
+.then(console.log)
+
+### login
+
+fetch("http://localhost:8081/api/v1/auth/login", {
+method: "post",
+headers: {
+'Accept': 'application/json',
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({
+username: 'admin1',
+password: 'password1'
+})
+})
+.then( (res) => {
+res.json()});
+
+### refresh
+
+fetch('http://localhost:8081/api/v1/auth/refresh', {
+    credentials: 'include'
+})
 .then(res => res.json())
 .then(console.log)

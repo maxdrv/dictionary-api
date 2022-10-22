@@ -50,9 +50,9 @@ public class AuthController {
 
         var setCookiesHeader = new CookieBuilder()
                 .addNode("jwt", loginResponse.refreshToken())
-                .addNode("HttpOnly")
-                .addNode("Secure")
                 .addNode("Max-Age", String.valueOf(SEVEN_DAYS_IN_SECONDS))
+                .addNode("Secure")  // TODO такую cookie браузер будет посылать только по https, except localhost
+                .addNode("HttpOnly")
                 .toHttpHeader();
 
         HttpHeaders headers = new HttpHeaders();
@@ -102,9 +102,9 @@ public class AuthController {
 
         var setCookiesHeader = new CookieBuilder()
                 .addNode("jwt", "")
-                .addNode("HttpOnly")
-                .addNode("Secure")
                 .addNode("Max-Age", "-1")
+                .addNode("Secure")  // TODO такую cookie браузер будет посылать только по https, except localhost
+                .addNode("HttpOnly")
                 .toHttpHeader();
 
         HttpHeaders headers = new HttpHeaders();
