@@ -17,8 +17,6 @@ import java.security.cert.CertificateException;
 import java.sql.Date;
 import java.time.Clock;
 
-import static java.util.Date.from;
-
 @RequiredArgsConstructor
 
 @Service
@@ -28,10 +26,10 @@ public class JwtProvider {
 
     private KeyStore keyStore;
 
-    @Value("${jwt.expiration.time.access}")
+    @Value("${jwt.expiration.time.millis.access}")
     private Long accessTokenExpirationInMillis;
 
-    @Value("${jwt.expiration.time.access}")
+    @Value("${jwt.expiration.time.millis.refresh}")
     private Long refreshTokenExpirationInMillis;
 
     @Value("${jwt.keystore.password}")
@@ -73,7 +71,7 @@ public class JwtProvider {
     private String generateToken(String username, PrivateKey privateKey, Long expirationInMillis) {
         return Jwts.builder()
                 .setSubject(username)
-                .setIssuedAt(from(clock.instant()))
+                .setIssuedAt(Date.from(clock.instant()))
                 .signWith(privateKey)
                 .setExpiration(Date.from(clock.instant().plusMillis(expirationInMillis)))
                 .compact();
