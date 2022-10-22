@@ -25,9 +25,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
-    public static final String AUTH_ROOT_URL = "/api/v1/auth";
-    public static final String AUTH_MATCH_URL = "/api/v1/auth/**";
-
     @Bean
     public UserDetailsService userDetailsService(ApiUserRepository apiUserRepository) {
         return new UserDetailsServiceImpl(apiUserRepository);
@@ -55,16 +52,20 @@ public class SecurityConfig {
      * permitAll() - разрешить все
      * Если на один из методов контроллера придет запрос и при этом этот метод попытается получить информацию о пользователе,
      * то такой метод контроллера проигнорирует настройку permitAll() и заблокирует доступ с ошибкой 403
+     *
+     * permitAll() обозначает, что любой authenticated user, однако что будет с анонимным доступом???
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.csrf().disable();
+
         http.authorizeRequests()
-                .antMatchers(AUTH_MATCH_URL).permitAll()
-                .antMatchers("/api/v1/admin/**").hasRole(AuthorityType.ADMIN.name())
                 .antMatchers(HttpMethod.GET, "/ping").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
+                .antMatchers("/api/v1/auth/**").permitAll()
+                .antMatchers("/api/v1/admin/**").hasAuthority(AuthorityType.ADMIN.name())
+                .antMatchers( "/api/v1/**").hasAuthority(AuthorityType.USER.name())
                 .anyRequest().authenticated();
+
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

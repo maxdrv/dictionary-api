@@ -23,10 +23,11 @@ public class ApiCaller {
     }
 
     @SneakyThrows
-    public SneakyResultActions getPageOfPhrase(String params) {
+    public SneakyResultActions getPageOfPhrase(String params, Header... headers) {
         return new SneakyResultActions(
                 mockMvc.perform(
                         MockMvcRequestBuilders.get("/api/v1/phrase" + params)
+                                .headers(toHttpHeaders(headers))
                 )
         );
     }

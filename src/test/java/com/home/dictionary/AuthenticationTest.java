@@ -38,7 +38,7 @@ public class AuthenticationTest extends WithDataBase {
                 .email(EMAIL);
 
         securedApiCaller.register(registerRequest)
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().json("{'message': 'User Registration Successful'}"));
 
         var user = apiUserRepository.findByUsernameOrThrow(USERNAME);
@@ -92,21 +92,6 @@ public class AuthenticationTest extends WithDataBase {
         securedApiCaller.login(loginRequest)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value("bad credentials"));
-    }
-
-    @Test
-    void getRequestDoesNotNeedAuthentication() {
-        securedApiCaller.getPageOfPhrase("?page=0&size=20")
-                .andExpect(status().isOk())
-                .andExpect(content().json("""
-                        {
-                            "size": 20,
-                            "number": 0,
-                            "totalElements": 0,
-                            "totalPages": 0,
-                            "content": []
-                        }
-                        """));
     }
 
     @Test
@@ -170,7 +155,30 @@ public class AuthenticationTest extends WithDataBase {
     }
 
     @Test
-    void requestAuthenticated() {
+    void getRequestAuthenticated() {
+        registerUserAndEnable();
+        var loginRequest = new LoginRequest().username(USERNAME).password(PASSWORD);
+        var response = securedApiCaller.login(loginRequest)
+                .andExpect(status().isOk())
+                .andReturnAs(AuthenticationResponse.class);
+
+        var bearerToken = response.getAccessToken();
+
+        securedApiCaller.getPageOfPhrase("?page=0&size=20", auth("Bearer " + bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                        {
+                            "size": 20,
+                            "number": 0,
+                            "totalElements": 0,
+                            "totalPages": 0,
+                            "content": []
+                        }
+                        """));
+    }
+
+    @Test
+    void postRequestAuthenticated() {
         registerUserAndEnable();
         var loginRequest = new LoginRequest().username(USERNAME).password(PASSWORD);
         var response = securedApiCaller.login(loginRequest)
@@ -189,6 +197,7 @@ public class AuthenticationTest extends WithDataBase {
         securedApiCaller.postPhrase(createPhraseRequest, auth("Bearer " + bearerToken))
                 .andExpect(status().isCreated());
 
+        // same access token works several times
         securedApiCaller.postPhrase(createPhraseRequest, auth("Bearer " + bearerToken))
                 .andExpect(status().isCreated());
     }

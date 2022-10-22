@@ -35,6 +35,15 @@ public class AppConfig {
                         ;
 
                 registry
+                        .addMapping("/api/v1/admin/user")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedOrigins(corsConfigurationProperties.getAllowedOrigins())
+                        .allowedHeaders("Origin", "Content-Type", "X-Auth-Token", "Authorization")
+                        .exposedHeaders()
+                        .allowCredentials(true)
+                ;
+
+                registry
                         .addMapping("/ping")
                         .allowedMethods("GET")
                         .allowedOrigins(corsConfigurationProperties.getAllowedOrigins());

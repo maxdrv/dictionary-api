@@ -1,9 +1,7 @@
 package com.home.dictionary.security;
 
-import com.home.dictionary.config.SecurityConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,17 +33,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse httpServletResponse,
             FilterChain filterChain
     ) throws ServletException, IOException {
+        String auth = Optional.ofNullable(httpServletRequest.getHeader("authorization"))
+                .orElseGet(() -> httpServletRequest.getHeader("Authorization"));
 
-        var uri = httpServletRequest.getRequestURI();
-        var method = httpServletRequest.getMethod();
-        if (uri.startsWith(SecurityConfig.AUTH_ROOT_URL) || HttpMethod.GET.name().equals(method)) {
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
-            return;
-        }
-
-        String auth = httpServletRequest.getHeader("Authorization");
         if (auth == null || auth.isBlank()) {
-            httpServletResponse.sendError(403, "forbidden");
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
         }
 
