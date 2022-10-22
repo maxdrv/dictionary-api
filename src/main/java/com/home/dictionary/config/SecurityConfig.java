@@ -60,12 +60,12 @@ public class SecurityConfig {
         http.csrf().disable();
 
         http.authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/ping").permitAll()
+                .antMatchers(HttpMethod.GET, "/ping").anonymous()
+                .antMatchers(HttpMethod.OPTIONS, "/ping").anonymous()
                 .antMatchers("/api/v1/auth/**").permitAll()
                 .antMatchers("/api/v1/admin/**").hasAuthority(AuthorityType.ADMIN.name())
                 .antMatchers( "/api/v1/**").hasAuthority(AuthorityType.USER.name())
                 .anyRequest().authenticated();
-
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
