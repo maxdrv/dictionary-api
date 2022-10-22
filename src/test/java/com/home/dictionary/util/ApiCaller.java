@@ -76,6 +76,16 @@ public class ApiCaller {
         );
     }
 
+    @SneakyThrows
+    public SneakyResultActions logout(Header... headers) {
+        return new SneakyResultActions(
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/auth/logout")
+                                .headers(toHttpHeaders(headers))
+                )
+        );
+    }
+
     private static HttpHeaders toHttpHeaders(Header... headers) {
         var httpHeaders = new HttpHeaders();
         for (Header header : headers) {

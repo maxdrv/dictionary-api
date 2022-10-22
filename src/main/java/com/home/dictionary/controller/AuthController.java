@@ -15,7 +15,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.net.HttpCookie;
 import java.util.List;
@@ -70,16 +73,7 @@ public class AuthController {
     public ResponseEntity<AuthenticationResponse> refreshToken(
             RequestEntity<Void> request
     ) {
-        var cookiesHeaders = Optional.ofNullable(request)
-                .map(HttpEntity::getHeaders)
-                .map(headers -> headers.get("Cookie"))
-                .orElse(List.of());
-
-        var jwtCookie = StreamEx.of(cookiesHeaders)
-                .flatMap(header -> HttpCookie.parse(header).stream())
-                .filter(cookie -> "jwt".equals(cookie.getName()))
-                .findFirst()
-                .orElse(null);
+        var jwtCookie = getJwt(request);
 
         if (jwtCookie == null || jwtCookie.getValue() == null || jwtCookie.getValue().isBlank()) {
             throw new ApiSecurityException("refresh token not provided");
@@ -97,11 +91,14 @@ public class AuthController {
     }
 
     @GetMapping("/api/v1/auth/logout")
-    public ResponseEntity<Void> logout(@CookieValue(name = "jwt") String refreshToken) {
-        if (refreshToken == null || refreshToken.isBlank()) {
+    public ResponseEntity<Void> logout(RequestEntity<Void> request) {
+        var jwtCookie = getJwt(request);
+
+        if (jwtCookie == null || jwtCookie.getValue() == null || jwtCookie.getValue().isBlank()) {
             return ResponseEntity.status(NO_CONTENT).build();
         }
-        authService.logout(refreshToken);
+
+        authService.logout(jwtCookie.getValue());
 
         var setCookiesHeader = new CookieBuilder()
                 .addNode("jwt", "")
@@ -117,6 +114,19 @@ public class AuthController {
                 .status(NO_CONTENT)
                 .headers(headers)
                 .build();
+    }
+
+    private HttpCookie getJwt(RequestEntity<Void> request) {
+        var cookiesHeaders = Optional.ofNullable(request)
+                .map(HttpEntity::getHeaders)
+                .map(headers -> headers.get("Cookie"))
+                .orElse(List.of());
+
+        return StreamEx.of(cookiesHeaders)
+                .flatMap(header -> HttpCookie.parse(header).stream())
+                .filter(cookie -> "jwt".equals(cookie.getName()))
+                .findFirst()
+                .orElse(null);
     }
 
 }

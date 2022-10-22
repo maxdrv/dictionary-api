@@ -222,6 +222,57 @@ public class AuthenticationTest extends WithDataBase {
         assertThat(savedUser.getRefreshToken()).isEqualTo(jwtCookie.getValue());
     }
 
+    @Test
+    void logoutInvalidatesCookieAndDeletesRefreshToken() {
+        registerUserAndEnable();
+
+        var loginRequest = new LoginRequest().username(USERNAME).password(PASSWORD);
+        var resultAction = securedApiCaller.login(loginRequest)
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists("jwt"));
+
+        var jwtCookie = resultAction.andReturn().getResponse().getCookie("jwt");
+        var response = resultAction.andReturnAs(AuthenticationResponse.class);
+
+        assertThat(response.getAccessToken()).isNotBlank();
+        assertThat(jwtCookie.getValue()).isNotBlank();
+
+        var resultAfterLogout = securedApiCaller.logout(Header.cookie("jwt", jwtCookie.getValue()))
+                .andExpect(status().isNoContent())
+                .andExpect(cookie().exists("jwt"))
+                .andExpect(cookie().httpOnly("jwt", true))
+                .andExpect(cookie().maxAge("jwt", -1))
+                .andExpect(cookie().secure("jwt", true));
+
+        var jwtCookieAfterLogout = resultAfterLogout.andReturn().getResponse().getCookie("jwt");
+        assertThat(jwtCookieAfterLogout.getValue()).isBlank();
+
+        var savedUser = apiUserRepository.findByUsernameOrThrow(USERNAME);
+        assertThat(savedUser.getRefreshToken()).isNull();
+    }
+
+    @Test
+    void refreshDoesNotProvideNewAccessTokenAfterLogout() {
+        registerUserAndEnable();
+
+        var loginRequest = new LoginRequest().username(USERNAME).password(PASSWORD);
+        var resultAction = securedApiCaller.login(loginRequest)
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists("jwt"));
+
+        var jwtCookie = resultAction.andReturn().getResponse().getCookie("jwt");
+        var response = resultAction.andReturnAs(AuthenticationResponse.class);
+
+        assertThat(response.getAccessToken()).isNotBlank();
+        assertThat(jwtCookie.getValue()).isNotBlank();
+
+        var resultAfterLogout = securedApiCaller.logout(Header.cookie("jwt", jwtCookie.getValue()))
+                .andExpect(status().isNoContent())
+                .andExpect(cookie().maxAge("jwt", -1));
+
+        securedApiCaller.refresh(Header.cookie("jwt", jwtCookie.getValue()))
+                .andExpect(status().isForbidden());
+    }
 
 
     void registerUserAndEnable() {
